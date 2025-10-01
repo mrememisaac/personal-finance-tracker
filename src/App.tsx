@@ -3,15 +3,16 @@ import { Wallet } from 'lucide-react';
 import { AuthProvider, ProtectedRoute, UserMenu } from './slices/auth';
 import { AppProvider } from './shared/context/AppContext';
 import { ErrorBoundary } from './app/ErrorBoundary';
-import { Navigation, TabId } from './app/Navigation';
+import { Navigation } from './app/Navigation';
+import type { TabId } from './app/Navigation';
 import { ServiceProvider } from './app/ServiceIntegration';
 
 // Import all slice components
-import { 
-  SummaryCards, 
-  RecentTransactions, 
-  ExpenseBreakdown, 
-  QuickActions 
+import {
+  SummaryCards,
+  RecentTransactions,
+  ExpenseBreakdown,
+  QuickActions
 } from './slices/dashboard';
 import { AccountListContainer, AccountFormContainer } from './slices/accounts/components';
 import { TransactionForm } from './slices/transaction';
@@ -42,7 +43,12 @@ function MainApp() {
               <RecentTransactions />
               <ExpenseBreakdown />
             </div>
-            <QuickActions />
+            <QuickActions
+              onAddTransaction={() => setActiveTab('transactions')}
+              onAddBudget={() => setActiveTab('budgets')}
+              onAddGoal={() => setActiveTab('goals')}
+              onViewReports={() => setActiveTab('reports')}
+            />
           </div>
         );
 
