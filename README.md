@@ -1,11 +1,94 @@
-# React + TypeScript + Vite
+# Personal Finance Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive personal finance tracking application built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Transaction tracking
+- Budget management
+- Financial goals
+- Reports and analytics
+- Account management
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
+```
+
+## Deployment to Cloudflare Pages
+
+This project is configured for deployment to Cloudflare Pages.
+
+### Prerequisites
+
+1. Install Wrangler CLI:
+```bash
+npm install -g wrangler
+```
+
+2. Login to Cloudflare:
+```bash
+wrangler login
+```
+
+### Deploy
+
+#### Option 1: Using Wrangler CLI (Direct Deploy)
+
+```bash
+# Build and deploy
+npm run deploy
+```
+
+#### Option 2: Using Cloudflare Dashboard (Git Integration)
+
+1. Go to [Cloudflare Pages](https://dash.cloudflare.com/pages)
+2. Click "Create a project"
+3. Connect your GitHub repository
+4. Configure build settings:
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dist`
+   - **Node version**: `20`
+5. Click "Save and Deploy"
+
+### Local Preview with Cloudflare Pages
+
+Test your build locally with Cloudflare Pages environment:
+
+```bash
+# Build first
+npm run build
+
+# Run local preview
+npm run pages:dev
+```
+
+### Configuration
+
+The project includes:
+- `wrangler.toml` - Cloudflare Pages configuration
+- `public/_redirects` - SPA routing configuration for client-side routing
+- `.node-version` - Node.js version specification
+
+## Tech Stack
+
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- Chart.js
+- Lucide Icons
 
 ## React Compiler
 
