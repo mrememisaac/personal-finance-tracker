@@ -148,8 +148,8 @@ export function ReportsDashboard() {
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${showFilters
-                  ? 'bg-blue-50 border-blue-300 text-blue-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-blue-50 border-blue-300 text-blue-700'
+                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
             >
               <Filter className="w-4 h-4" />
@@ -392,8 +392,8 @@ export function ReportsDashboard() {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full ${item.budgeted > 0 && item.spent > item.budgeted
-                          ? 'bg-red-500'
-                          : 'bg-blue-500'
+                        ? 'bg-red-500'
+                        : 'bg-blue-500'
                         }`}
                       style={{
                         width: `${item.budgeted > 0 ? Math.min((item.spent / item.budgeted) * 100, 100) : 0}%`
