@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { formatCurrency, formatDate, sortBy } from '../../../shared/utils';
@@ -15,8 +15,8 @@ function TransactionItem({ transaction, currency, dateFormat }: TransactionItemP
   const amount = Math.abs(transaction.amount);
 
   const getTransactionStyles = () => {
-    return isIncome 
-      ? 'text-green-600 bg-green-50 border-green-200' 
+    return isIncome
+      ? 'text-green-600 bg-green-50 border-green-200'
       : 'text-red-600 bg-red-50 border-red-200';
   };
 
@@ -88,7 +88,7 @@ export function RecentTransactions() {
           Last {recentTransactions.length} transactions
         </span>
       </div>
-      
+
       <div className="space-y-2">
         {recentTransactions.map((transaction) => (
           <TransactionItem
@@ -99,7 +99,7 @@ export function RecentTransactions() {
           />
         ))}
       </div>
-      
+
       {transactions.length > 5 && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">

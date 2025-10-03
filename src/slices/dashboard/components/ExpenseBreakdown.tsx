@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PieChart, TrendingDown, Info } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
-import { formatCurrency, formatPercentage, getCurrentMonthRange, groupBy, sumBy } from '../../../shared/utils';
+import { formatCurrency, getCurrentMonthRange, groupBy, sumBy } from '../../../shared/utils';
 import type { Transaction } from '../../../shared/types';
 
 interface CategoryBreakdownProps {
@@ -16,14 +16,14 @@ function CategoryBreakdown({ category, amount, percentage, currency, color }: Ca
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div 
+    <div
       className="relative"
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
       <div className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors duration-200 rounded-lg cursor-pointer">
         <div className="flex items-center space-x-3">
-          <div 
+          <div
             className="w-4 h-4 rounded-full"
             style={{ backgroundColor: color }}
           />
@@ -33,9 +33,9 @@ function CategoryBreakdown({ category, amount, percentage, currency, color }: Ca
               <div className="w-24 bg-gray-200 rounded-full h-2">
                 <div
                   className="h-2 rounded-full transition-all duration-300"
-                  style={{ 
+                  style={{
                     width: `${Math.min(percentage, 100)}%`,
-                    backgroundColor: color 
+                    backgroundColor: color
                   }}
                 />
               </div>
@@ -49,7 +49,7 @@ function CategoryBreakdown({ category, amount, percentage, currency, color }: Ca
           </p>
         </div>
       </div>
-      
+
       {showTooltip && (
         <div className="absolute z-10 bg-gray-800 text-white text-sm rounded-lg py-2 px-3 -top-10 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
           <div className="flex items-center space-x-2">
@@ -72,9 +72,9 @@ export function ExpenseBreakdown() {
 
   // Filter expenses for current month
   const currentMonthExpenses = transactions.filter(
-    (transaction: Transaction) => 
-      transaction.type === 'expense' && 
-      transaction.date >= start && 
+    (transaction: Transaction) =>
+      transaction.type === 'expense' &&
+      transaction.date >= start &&
       transaction.date <= end
   );
 
@@ -88,7 +88,7 @@ export function ExpenseBreakdown() {
 
   // Sort by amount (highest first)
   const sortedCategories = categoryTotals.sort((a, b) => b.amount - a.amount);
-  
+
   // Calculate total expenses
   const totalExpenses = sortedCategories.reduce((sum, cat) => sum + cat.amount, 0);
 

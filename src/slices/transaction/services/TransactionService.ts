@@ -7,11 +7,9 @@ import type {
 import { Transaction } from '../Transaction';
 import { 
   formatCurrency, 
-  getDateFilter, 
   getCurrentMonthRange, 
   getCurrentWeekRange,
   isDateInRange,
-  sortBy,
   groupBy,
   sumBy
 } from '../../../shared/utils';
@@ -218,8 +216,10 @@ export class TransactionService {
         bVal = bVal.toLowerCase() as any;
       }
 
-      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      if (aVal !== undefined && bVal !== undefined) {
+        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      }
       return 0;
     });
   }

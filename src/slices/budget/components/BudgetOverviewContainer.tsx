@@ -1,17 +1,18 @@
-import React from 'react';
+
 import { useAppContext } from '../../../shared/context/AppContext';
 import { BudgetOverview } from './BudgetOverview';
+import type { Budget } from '../../../shared/types';
 
 export function BudgetOverviewContainer() {
   const { state } = useAppContext();
-  
+
   // Transform budget data to include calculated fields
-  const budgetsWithProgress = state.budgets.map(budget: => {
+  const budgetsWithProgress = state.budgets.map((budget: Budget) => {
     // Calculate spent amount (this would normally come from transactions)
     const spent = 0; // TODO: Calculate from transactions
     const remaining = Math.max(0, budget.limit - spent);
     const percentage = budget.limit > 0 ? (spent / budget.limit) * 100 : 0;
-    
+
     let status: 'safe' | 'warning' | 'danger' = 'safe';
     if (percentage >= 100) {
       status = 'danger';
@@ -19,7 +20,7 @@ export function BudgetOverviewContainer() {
       status = 'warning';
     }
 
-    const formatCurrency = (amount: number) => 
+    const formatCurrency = (amount: number) =>
       new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -43,5 +44,5 @@ export function BudgetOverviewContainer() {
     };
   });
 
-  return <BudgetOverview budgets={budgetsWithProgress} />;
+  return <BudgetOverview budgets={budgetsWithProgress as any} />;
 }

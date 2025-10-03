@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
+import { useState, useMemo } from 'react';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
   Filter,
   CreditCard,
   PiggyBank,
@@ -16,13 +16,13 @@ import {
 import { useAppContext } from '../../../shared/context/AppContext';
 import { AccountService } from '../services/AccountService';
 import { AccountForm } from './AccountForm';
-import { 
+import {
   ACCOUNT_TYPES,
   SUPPORTED_CURRENCIES,
   SUCCESS_MESSAGES,
-  ERROR_MESSAGES 
+  ERROR_MESSAGES
 } from '../../../shared/constants';
-import { formatCurrency, formatDate } from '../../../shared/utils';
+import { formatDate } from '../../../shared/utils';
 import type { Account as IAccount } from '../../../shared/types';
 
 interface AccountListProps {
@@ -44,10 +44,10 @@ interface ConfirmDeleteState {
   account: IAccount | null;
 }
 
-export function AccountList({ 
-  onAccountSelect, 
-  showActions = true, 
-  compact = false 
+export function AccountList({
+  onAccountSelect,
+  showActions = true,
+  compact = false
 }: AccountListProps) {
   const { state, dispatch } = useAppContext();
   const { accounts, transactions } = state;
@@ -69,13 +69,13 @@ export function AccountList({
   const [showFilters, setShowFilters] = useState(false);
 
   // Create account service instance
-  const accountService = useMemo(() => 
+  const accountService = useMemo(() =>
     new AccountService(dispatch, () => accounts, () => transactions),
     [dispatch, accounts, transactions]
   );
 
   // Get account summaries with current balances
-  const accountSummaries = useMemo(() => 
+  const accountSummaries = useMemo(() =>
     accountService.getAccountSummaries(),
     [accountService]
   );
@@ -87,7 +87,7 @@ export function AccountList({
     // Apply search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(account => 
+      filtered = filtered.filter(account =>
         account.name.toLowerCase().includes(searchTerm) ||
         account.type.toLowerCase().includes(searchTerm)
       );
@@ -111,15 +111,17 @@ export function AccountList({
 
     // Apply sorting
     filtered.sort((a, b) => {
-      let aVal: any = a[filters.sortBy];
-      let bVal: any = b[filters.sortBy];
-
-      // Handle special sorting cases
+      let aVal: any;
+      let bVal: any;
+      
       if (filters.sortBy === 'createdAt') {
         const aAccount = accounts.find(acc => acc.id === a.id);
         const bAccount = accounts.find(acc => acc.id === b.id);
         aVal = aAccount?.createdAt.getTime() || 0;
         bVal = bAccount?.createdAt.getTime() || 0;
+      } else {
+        aVal = (a as any)[filters.sortBy];
+        bVal = (b as any)[filters.sortBy];
       }
 
       if (typeof aVal === 'string') {
@@ -152,7 +154,7 @@ export function AccountList({
   };
 
   // Get status icon and color
-  const getStatusDisplay = (status: string, balance: number) => {
+  const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'positive':
         return {
@@ -211,7 +213,7 @@ export function AccountList({
 
     try {
       const result = accountService.deleteAccount(confirmDelete.account.id);
-      
+
       if (result.isValid) {
         console.log(SUCCESS_MESSAGES.ACCOUNT_DELETED);
         setConfirmDelete({ isOpen: false, account: null });
@@ -224,7 +226,7 @@ export function AccountList({
     }
   };
 
-  const handleAccountSuccess = (account: IAccount) => {
+  const handleAccountSuccess = () => {
     // Refresh is handled by the context automatically
     setIsFormOpen(false);
     setEditingAccount(null);
@@ -285,7 +287,7 @@ export function AccountList({
             <Filter className="w-4 h-4 mr-1" />
             Filters
           </button>
-          
+
           {(filters.type || filters.currency) && (
             <button
               onClick={clearFilters}
@@ -348,7 +350,7 @@ export function AccountList({
             {accounts.length === 0 ? 'No accounts yet' : 'No accounts match your filters'}
           </h3>
           <p className="text-gray-500 mb-4">
-            {accounts.length === 0 
+            {accounts.length === 0
               ? 'Get started by adding your first account'
               : 'Try adjusting your search or filter criteria'
             }
@@ -373,9 +375,8 @@ export function AccountList({
                 <button
                   key={sortKey}
                   onClick={() => handleSort(sortKey)}
-                  className={`capitalize hover:text-gray-700 transition-colors ${
-                    filters.sortBy === sortKey ? 'text-blue-600 font-medium' : ''
-                  }`}
+                  className={`capitalize hover:text-gray-700 transition-colors ${filters.sortBy === sortKey ? 'text-blue-600 font-medium' : ''
+                    }`}
                 >
                   {sortKey === 'createdAt' ? 'Date Created' : sortKey}
                   {filters.sortBy === sortKey && (
@@ -391,14 +392,13 @@ export function AccountList({
           {/* Account Cards */}
           {filteredAccounts.map((accountSummary) => {
             const account = accounts.find(a => a.id === accountSummary.id)!;
-            const statusDisplay = getStatusDisplay(accountSummary.status, accountSummary.balance);
-            
+            const statusDisplay = getStatusDisplay(accountSummary.status);
+
             return (
               <div
                 key={account.id}
-                className={`bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow ${
-                  compact ? 'p-3' : 'p-4'
-                } ${onAccountSelect ? 'cursor-pointer hover:border-blue-300' : ''}`}
+                className={`bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow ${compact ? 'p-3' : 'p-4'
+                  } ${onAccountSelect ? 'cursor-pointer hover:border-blue-300' : ''}`}
                 onClick={() => onAccountSelect?.(account)}
               >
                 <div className="flex items-center justify-between">
@@ -408,9 +408,8 @@ export function AccountList({
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center space-x-2">
-                        <h3 className={`font-medium text-gray-900 truncate ${
-                          compact ? 'text-sm' : 'text-base'
-                        }`}>
+                        <h3 className={`font-medium text-gray-900 truncate ${compact ? 'text-sm' : 'text-base'
+                          }`}>
                           {account.name}
                         </h3>
                         {statusDisplay.icon}
@@ -437,9 +436,8 @@ export function AccountList({
 
                   <div className="flex items-center space-x-3">
                     <div className="text-right">
-                      <p className={`font-semibold ${statusDisplay.color} ${
-                        compact ? 'text-sm' : 'text-base'
-                      }`}>
+                      <p className={`font-semibold ${statusDisplay.color} ${compact ? 'text-sm' : 'text-base'
+                        }`}>
                         {accountSummary.formattedBalance}
                       </p>
                       {!compact && (
@@ -510,9 +508,9 @@ export function AccountList({
                   </p>
                 </div>
               </div>
-              
+
               <p className="text-gray-700 mb-6">
-                Are you sure you want to delete "{confirmDelete.account.name}"? 
+                Are you sure you want to delete "{confirmDelete.account.name}"?
                 This will also delete all associated transactions.
               </p>
 

@@ -26,11 +26,16 @@ export class ReportService {
   private transactionService?: TransactionService;
   private accountService?: AccountService;
   private budgetService?: BudgetService;
+  state: AppState;
+  dispatch: React.Dispatch<AppAction>;
 
   constructor(
-    private state: AppState,
-    private dispatch: React.Dispatch<AppAction>
-  ) {}
+    state: AppState,
+    dispatch: React.Dispatch<AppAction>
+  ) {
+    this.state = state;
+    this.dispatch = dispatch;
+  }
 
   setTransactionService(transactionService: TransactionService) {
     this.transactionService = transactionService;
@@ -49,7 +54,7 @@ export class ReportService {
       throw new Error('TransactionService not available');
     }
 
-    const transactions = dateRange 
+    const transactions = dateRange
       ? this.transactionService.getTransactions({ dateRange })
       : this.transactionService.getTransactions();
 
@@ -79,13 +84,13 @@ export class ReportService {
     transactions.forEach(t => {
       const monthKey = `${t.date.getFullYear()}-${String(t.date.getMonth() + 1).padStart(2, '0')}`;
       const current = monthlyMap.get(monthKey) || { income: 0, expenses: 0 };
-      
+
       if (t.type === 'income') {
         current.income += t.amount;
       } else {
         current.expenses += Math.abs(t.amount);
       }
-      
+
       monthlyMap.set(monthKey, current);
     });
 
@@ -104,27 +109,27 @@ export class ReportService {
 
   getIncomeVsExpenseChartData(dateRange?: { start: Date; end: Date }): ChartData {
     const report = this.generateSpendingReport(dateRange);
-    
+
     return {
       labels: report.monthlyTrends.map(t => {
         const [year, month] = t.month.split('-');
-        return new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString('en-US', { 
-          month: 'short', 
-          year: 'numeric' 
+        return new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric'
         });
       }),
       datasets: [
         {
           label: 'Income',
           data: report.monthlyTrends.map(t => t.income),
-          backgroundColor: 'rgba(34, 197, 94, 0.8)',
+          backgroundColor: ['rgba(34, 197, 94, 0.8)'],
           borderColor: 'rgba(34, 197, 94, 1)',
           borderWidth: 2,
         },
         {
           label: 'Expenses',
           data: report.monthlyTrends.map(t => t.expenses),
-          backgroundColor: 'rgba(239, 68, 68, 0.8)',
+          backgroundColor: ['rgba(239, 68, 68, 0.8)'],
           borderColor: 'rgba(239, 68, 68, 1)',
           borderWidth: 2,
         },
@@ -134,7 +139,7 @@ export class ReportService {
 
   getCategoryBreakdownChartData(dateRange?: { start: Date; end: Date }): ChartData {
     const report = this.generateSpendingReport(dateRange);
-    
+
     const colors = [
       '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
       '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
@@ -158,7 +163,7 @@ export class ReportService {
     }
 
     const accounts = this.accountService.getAccounts();
-    
+
     return {
       labels: accounts.map(a => a.name),
       datasets: [
@@ -215,13 +220,13 @@ export class ReportService {
 
     // CSV format
     const lines: string[] = [];
-    
+
     // Summary
     lines.push('Summary');
     lines.push('Total Income,Total Expenses,Net Balance');
     lines.push(`${report.totalIncome},${report.totalExpenses},${report.netBalance}`);
     lines.push('');
-    
+
     // Category breakdown
     lines.push('Category Breakdown');
     lines.push('Category,Amount,Percentage');
@@ -229,7 +234,7 @@ export class ReportService {
       lines.push(`${item.category},${item.amount},${item.percentage.toFixed(2)}%`);
     });
     lines.push('');
-    
+
     // Monthly trends
     lines.push('Monthly Trends');
     lines.push('Month,Income,Expenses');
@@ -288,12 +293,12 @@ export class ReportService {
 
   private calculateIncomeExpenseScore(): number {
     if (!this.transactionService) return 50;
-    
+
     const totalIncome = this.transactionService.calculateTotalIncome();
     const totalExpenses = this.transactionService.calculateTotalExpenses();
-    
+
     if (totalIncome === 0) return 0;
-    
+
     const ratio = totalExpenses / totalIncome;
     if (ratio <= 0.5) return 100;
     if (ratio <= 0.7) return 80;
@@ -304,10 +309,10 @@ export class ReportService {
 
   private calculateBudgetAdherenceScore(): number {
     if (!this.budgetService) return 50;
-    
+
     const budgets = this.budgetService.getBudgets().filter(b => b.isActive);
     if (budgets.length === 0) return 50;
-    
+
     let totalScore = 0;
     budgets.forEach(budget => {
       const progress = this.budgetService!.calculateBudgetProgress(budget.id);
@@ -319,29 +324,29 @@ export class ReportService {
         totalScore += 20;
       }
     });
-    
+
     return totalScore / budgets.length;
   }
 
   private calculateGoalProgressScore(): number {
     const goals = this.state.goals.filter(g => !g.isCompleted);
     if (goals.length === 0) return 50;
-    
+
     let totalProgress = 0;
     goals.forEach(goal => {
       const progress = (goal.currentAmount / goal.targetAmount) * 100;
       totalProgress += Math.min(100, progress);
     });
-    
+
     return totalProgress / goals.length;
   }
 
   private calculateAccountDiversityScore(): number {
     if (!this.accountService) return 50;
-    
+
     const accounts = this.accountService.getAccounts();
     const uniqueTypes = new Set(accounts.map(a => a.type));
-    
+
     // Score based on number of different account types
     switch (uniqueTypes.size) {
       case 0: return 0;

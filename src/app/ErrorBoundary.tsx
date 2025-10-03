@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Props {
@@ -48,7 +49,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Something went wrong
               </h1>
             </div>
-            
+
             <p className="text-gray-600 mb-6">
               We're sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.
             </p>

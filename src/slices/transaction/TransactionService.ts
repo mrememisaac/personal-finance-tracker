@@ -1,16 +1,21 @@
-import type { AppState, AppAction } from '../../shared/types';
-import type { Transaction } from './Transaction';
+import type { AppState, AppAction, Transaction as ITransaction } from '../../shared/types';
+import { Transaction } from './Transaction';
 import type { BudgetService } from '../budget/BudgetService';
 import type { AccountService } from '../accounts/AccountService';
 
 export class TransactionService {
   private budgetService?: BudgetService;
   private accountService?: AccountService;
+  state: AppState;
+  dispatch: React.Dispatch<AppAction>;
 
   constructor(
-    private state: AppState,
-    private dispatch: React.Dispatch<AppAction>
-  ) {}
+    state: AppState,
+    dispatch: React.Dispatch<AppAction>
+  ) {
+    this.state = state;
+    this.dispatch = dispatch;
+  }
 
   setBudgetService(budgetService: BudgetService) {
     this.budgetService = budgetService;
@@ -40,17 +45,17 @@ export class TransactionService {
 
     // Update budget progress
     if (this.budgetService && transaction.type === 'expense') {
-      this.budgetService.updateBudgetProgress(transaction.category, Math.abs(transaction.amount));
+      this.budgetService.updateBudgetProgress(transaction.category);
     }
 
     return newTransaction;
   }
 
-  updateTransaction(id: string, updates: Partial<Transaction>): Transaction | null {
+  updateTransaction(id: string, updates: Partial<ITransaction>): Transaction | null {
     const existingTransaction = this.state.transactions.find(t => t.id === id);
     if (!existingTransaction) return null;
 
-    const updatedTransaction = {
+    const updatedTransactionData = {
       ...existingTransaction,
       ...updates,
       updatedAt: new Date(),
@@ -72,7 +77,7 @@ export class TransactionService {
       );
     }
 
-    return updatedTransaction;
+    return new Transaction(updatedTransactionData);
   }
 
   deleteTransaction(id: string): boolean {
@@ -111,19 +116,20 @@ export class TransactionService {
         transactions = transactions.filter(t => t.type === filters.type);
       }
       if (filters.dateRange) {
-        transactions = transactions.filter(t => 
+        transactions = transactions.filter(t =>
           t.date >= filters.dateRange!.start && t.date <= filters.dateRange!.end
         );
       }
     }
 
-    return transactions.sort((a, b) => b.date.getTime() - a.date.getTime());
+    return transactions.sort((a, b) => b.date.getTime() - a.date.getTime())
+      .map(transaction => new Transaction(transaction));
   }
 
   getTransactionsByCategory(): Map<string, Transaction[]> {
     const categoryMap = new Map<string, Transaction[]>();
-    
-    this.state.transactions.forEach(transaction => {
+
+    this.getTransactions().forEach(transaction => {
       const existing = categoryMap.get(transaction.category) || [];
       categoryMap.set(transaction.category, [...existing, transaction]);
     });
@@ -154,11 +160,11 @@ export class TransactionService {
 
   exportTransactions(format: 'csv' | 'json'): string {
     const transactions = this.getTransactions();
-    
+
     if (format === 'json') {
       return JSON.stringify(transactions, null, 2);
     }
-    
+
     // CSV format
     const headers = ['Date', 'Description', 'Category', 'Type', 'Amount', 'Account'];
     const rows = transactions.map(t => [
@@ -169,7 +175,7 @@ export class TransactionService {
       t.amount.toString(),
       t.accountId
     ]);
-    
+
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
 }

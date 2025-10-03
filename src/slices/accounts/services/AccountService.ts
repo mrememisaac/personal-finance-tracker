@@ -1,15 +1,13 @@
 import type { Dispatch } from 'react';
-import type { 
-  Account as IAccount, 
+import type {
+  Account as IAccount,
   Transaction as ITransaction,
   ValidationResult,
-  AppAction 
+  AppAction
 } from '../../../shared/types';
 import { Account } from '../Account';
-import { 
-  formatCurrency, 
-  sortBy,
-  sumBy
+import {
+  formatCurrency
 } from '../../../shared/utils';
 
 export class AccountService {
@@ -35,17 +33,17 @@ export class AccountService {
   addAccount(accountData: Omit<IAccount, 'id' | 'createdAt' | 'updatedAt'>): ValidationResult & { account?: Account } {
     // Validate the account data
     const validation = Account.validate(accountData as Partial<IAccount>);
-    
+
     if (!validation.isValid) {
       return validation;
     }
 
     // Check for duplicate account names
     const existingAccounts = this.getAccounts();
-    const duplicateName = existingAccounts.find(a => 
+    const duplicateName = existingAccounts.find(a =>
       a.name.toLowerCase() === accountData.name.toLowerCase()
     );
-    
+
     if (duplicateName) {
       return {
         isValid: false,
@@ -55,7 +53,7 @@ export class AccountService {
 
     // Create new account with generated metadata
     const account = Account.create(accountData);
-    
+
     // Dispatch action to add to global state
     this.dispatch({
       type: 'ADD_ACCOUNT',
@@ -75,7 +73,7 @@ export class AccountService {
   updateAccount(id: string, updates: Partial<IAccount>): ValidationResult & { account?: Account } {
     const accounts = this.getAccounts();
     const existingAccount = accounts.find(a => a.id === id);
-    
+
     if (!existingAccount) {
       return {
         isValid: false,
@@ -85,10 +83,10 @@ export class AccountService {
 
     // Check for duplicate names (excluding current account)
     if (updates.name) {
-      const duplicateName = accounts.find(a => 
+      const duplicateName = accounts.find(a =>
         a.id !== id && a.name.toLowerCase() === updates.name!.toLowerCase()
       );
-      
+
       if (duplicateName) {
         return {
           isValid: false,
@@ -100,7 +98,7 @@ export class AccountService {
     // Merge existing data with updates for validation
     const updatedData = { ...existingAccount, ...updates };
     const validation = Account.validate(updatedData);
-    
+
     if (!validation.isValid) {
       return validation;
     }
@@ -126,7 +124,7 @@ export class AccountService {
   deleteAccount(id: string): ValidationResult {
     const accounts = this.getAccounts();
     const existingAccount = accounts.find(a => a.id === id);
-    
+
     if (!existingAccount) {
       return {
         isValid: false,
@@ -137,7 +135,7 @@ export class AccountService {
     // Check if account has transactions
     const transactions = this.getTransactions();
     const accountTransactions = transactions.filter(t => t.accountId === id);
-    
+
     if (accountTransactions.length > 0) {
       return {
         isValid: false,
@@ -162,7 +160,7 @@ export class AccountService {
   getAccount(id: string): Account | null {
     const accounts = this.getAccounts();
     const accountData = accounts.find(a => a.id === id);
-    
+
     return accountData ? new Account(accountData) : null;
   }
 
@@ -181,7 +179,7 @@ export class AccountService {
   calculateAccountBalance(accountId: string): number {
     const transactions = this.getTransactions();
     const accountTransactions = transactions.filter(t => t.accountId === accountId);
-    
+
     const account = this.getAccount(accountId);
     if (!account) {
       return 0;
@@ -189,7 +187,7 @@ export class AccountService {
 
     // Start with the account's initial balance and add all transactions
     let balance = account.balance;
-    
+
     // Add all transaction amounts (income is positive, expenses are negative)
     accountTransactions.forEach(transaction => {
       if (transaction.type === 'income') {
@@ -215,9 +213,9 @@ export class AccountService {
     }
 
     const newBalance = this.calculateAccountBalance(accountId);
-    
+
     const result = this.updateAccount(accountId, { balance: newBalance });
-    
+
     return {
       ...result,
       newBalance
@@ -273,7 +271,7 @@ export class AccountService {
 
     accounts.forEach(account => {
       const currentBalance = this.calculateAccountBalance(account.id);
-      
+
       if (!summary[account.type]) {
         summary[account.type] = {
           balance: 0,
@@ -301,7 +299,7 @@ export class AccountService {
    */
   canAccommodateTransaction(accountId: string, amount: number): ValidationResult {
     const account = this.getAccount(accountId);
-    
+
     if (!account) {
       return {
         isValid: false,
@@ -311,7 +309,7 @@ export class AccountService {
 
     const currentBalance = this.calculateAccountBalance(accountId);
     const canAccommodate = account.canAccommodateTransaction(amount);
-    
+
     if (!canAccommodate) {
       const newBalance = currentBalance + amount;
       let errorMessage = '';
@@ -424,7 +422,7 @@ export class AccountService {
    */
   exportToCSV(): string {
     const accounts = this.getAllAccounts();
-    
+
     if (accounts.length === 0) {
       return 'No accounts to export';
     }
@@ -460,7 +458,7 @@ export class AccountService {
 
     // Combine headers and rows
     const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
-    
+
     return csvContent;
   }
 
@@ -471,7 +469,7 @@ export class AccountService {
     const accounts = this.getAllAccounts();
     const summaries = this.getAccountSummaries();
     const typeBalances = this.getTotalBalanceByType();
-    
+
     const exportData = {
       exportDate: new Date().toISOString(),
       accountCount: accounts.length,
@@ -502,7 +500,7 @@ export class AccountService {
       return accounts;
     }
 
-    return accounts.filter(account => 
+    return accounts.filter(account =>
       account.name.toLowerCase().includes(searchTerm) ||
       account.type.toLowerCase().includes(searchTerm) ||
       account.accountTypeDisplayName.toLowerCase().includes(searchTerm)
@@ -514,7 +512,7 @@ export class AccountService {
    */
   getSortedAccounts(sortBy: keyof IAccount = 'name', direction: 'asc' | 'desc' = 'asc'): Account[] {
     const accounts = this.getAllAccounts();
-    
+
     return accounts.sort((a, b) => {
       let aVal = a[sortBy];
       let bVal = b[sortBy];

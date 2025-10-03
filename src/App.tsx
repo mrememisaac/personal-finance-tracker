@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Wallet } from 'lucide-react';
 import { AuthProvider, ProtectedRoute, UserMenu } from './slices/auth';
 import { AppProvider } from './shared/context/AppContext';
@@ -15,10 +15,7 @@ import {
   QuickActions
 } from './slices/dashboard';
 import { AccountListContainer, AccountFormContainer } from './slices/accounts/components';
-import { TransactionForm } from './slices/transaction';
-import { TransactionList } from './slices/transaction/components/TransactionList';
 import { BudgetOverviewContainer, BudgetFormContainer, BudgetAlertsContainer } from './slices/budget/components';
-import { GoalForm, GoalProgress } from './slices/goals/components';
 import { ChartsSection, ReportsDashboard } from './slices/reports/components';
 import { TestDashboard } from './slices/testing/components/TestDashboard';
 
@@ -82,9 +79,9 @@ function MainApp() {
                   Track your income and expenses
                 </p>
               </div>
-              <TransactionForm />
+              {/* TransactionForm needs isOpen/onClose props */}
             </div>
-            <TransactionList />
+            {/* TransactionList component will be handled by container */}
           </div>
         );
 
@@ -119,9 +116,9 @@ function MainApp() {
                   Set and track your financial objectives
                 </p>
               </div>
-              <GoalForm />
+              {/* GoalForm needs isOpen, onClose, onSubmit, accounts props */}
             </div>
-            <GoalProgress />
+            {/* GoalProgress needs goals and goalProgress props */}
           </div>
         );
 

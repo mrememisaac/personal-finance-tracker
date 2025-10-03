@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { AccountForm } from './AccountForm';
@@ -32,11 +32,11 @@ export function AccountFormContainer() {
         <Plus className="h-4 w-4 mr-2" />
         Add Account
       </button>
-      
+
       <AccountForm
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSubmit={handleSubmit}
+        onSuccess={handleSubmit}
       />
     </>
   );

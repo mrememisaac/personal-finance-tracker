@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { authService, type AuthState, type User, type LoginCredentials, type SignupCredentials } from './AuthService';
 
 // Action types
@@ -131,7 +132,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const result = await authService.login(credentials);
-      
+
       if (result.success && result.user) {
         dispatch({ type: 'LOGIN_SUCCESS', payload: result.user });
         return true;
@@ -151,7 +152,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const result = await authService.signup(credentials);
-      
+
       if (result.success && result.user) {
         dispatch({ type: 'LOGIN_SUCCESS', payload: result.user });
         return true;

@@ -1,11 +1,17 @@
 import type { AppState, AppAction } from '../../shared/types';
-import type { Account } from './Account';
+import { Account } from './Account';
 
 export class AccountService {
+  state: AppState;
+  dispatch: React.Dispatch<AppAction>;
+
   constructor(
-    private state: AppState,
-    private dispatch: React.Dispatch<AppAction>
-  ) {}
+    state: AppState,
+    dispatch: React.Dispatch<AppAction>
+  ) {
+    this.state = state;
+    this.dispatch = dispatch;
+  }
 
   createAccount(account: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>): Account {
     const newAccount: Account = {
@@ -27,7 +33,7 @@ export class AccountService {
     const existingAccount = this.state.accounts.find(a => a.id === id);
     if (!existingAccount) return null;
 
-    const updatedAccount = {
+    const updatedAccountData = {
       ...existingAccount,
       ...updates,
       updatedAt: new Date(),
@@ -38,7 +44,7 @@ export class AccountService {
       payload: { id, updates: { ...updates, updatedAt: new Date() } },
     });
 
-    return updatedAccount;
+    return new Account(updatedAccountData);
   }
 
   deleteAccount(id: string): boolean {
@@ -60,11 +66,13 @@ export class AccountService {
   }
 
   getAccounts(): Account[] {
-    return [...this.state.accounts].sort((a, b) => a.name.localeCompare(b.name));
+    return [...this.state.accounts].sort((a, b) => a.name.localeCompare(b.name))
+      .map(account => new Account(account));
   }
 
   getAccountById(id: string): Account | undefined {
-    return this.state.accounts.find(a => a.id === id);
+    const account = this.state.accounts.find(a => a.id === id);
+    return account ? new Account(account) : undefined;
   }
 
   updateAccountBalance(accountId: string, amount: number): void {
@@ -95,7 +103,7 @@ export class AccountService {
   } {
     const accounts = this.getAccounts();
     const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
-    
+
     const accountsByType = new Map<string, Account[]>();
     accounts.forEach(account => {
       const existing = accountsByType.get(account.type) || [];

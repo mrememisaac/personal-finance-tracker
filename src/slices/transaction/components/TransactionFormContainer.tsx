@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { TransactionForm } from './TransactionForm';
@@ -32,11 +32,11 @@ export function TransactionFormContainer() {
         <Plus className="h-4 w-4 mr-2" />
         Add Transaction
       </button>
-      
+
       <TransactionForm
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSubmit={handleSubmit}
+        onSuccess={handleSubmit}
       />
     </>
   );

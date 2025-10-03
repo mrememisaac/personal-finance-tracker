@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { User, LogOut, Settings, Shield, ChevronDown } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
@@ -40,7 +40,7 @@ export function UserMenu() {
   const formatLastLogin = (date: Date): string => {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       return 'Just now';
     } else if (diffInHours < 24) {
@@ -64,13 +64,13 @@ export function UserMenu() {
             {getInitials(state.user.name)}
           </span>
         </div>
-        
+
         {/* User Info */}
         <div className="hidden md:block text-left">
           <p className="text-sm font-medium text-gray-900">{state.user.name}</p>
           <p className="text-xs text-gray-500">{state.user.email}</p>
         </div>
-        
+
         {/* Dropdown Arrow */}
         <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
@@ -105,7 +105,7 @@ export function UserMenu() {
               <User className="w-4 h-4 mr-3 text-gray-400" />
               Profile Settings
             </button>
-            
+
             <button
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -113,7 +113,7 @@ export function UserMenu() {
               <Settings className="w-4 h-4 mr-3 text-gray-400" />
               App Settings
             </button>
-            
+
             <button
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

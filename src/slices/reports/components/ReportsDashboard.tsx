@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Download, Filter, Calendar, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { ReportService } from '../services/ReportService';
 import { ChartsSection } from './ChartsSection';
 import { formatCurrency, getDateFilter } from '../../../shared/utils';
-import type { DatePeriod, TransactionFilters } from '../../../shared/types';
+import type { DatePeriod } from '../../../shared/types';
 
 interface FilterState {
   period: DatePeriod;
@@ -51,13 +51,6 @@ export function ReportsDashboard() {
 
   // Generate reports with current filters
   const reports = useMemo(() => {
-    const transactionFilters: TransactionFilters = {
-      dateRange,
-      categories: filters.categories.length > 0 ? filters.categories : undefined,
-      types: filters.types.length > 0 ? filters.types : undefined,
-      accounts: filters.accounts.length > 0 ? filters.accounts : undefined
-    };
-
     return {
       spending: reportService.generateSpendingReport(dateRange),
       comparison: reportService.generateIncomeVsExpenseReport(dateRange),
@@ -149,16 +142,15 @@ export function ReportsDashboard() {
               Analyze your financial data with detailed reports and visualizations
             </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
-                showFilters
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${showFilters
                   ? 'bg-blue-50 border-blue-300 text-blue-700'
                   : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
+                }`}
             >
               <Filter className="w-4 h-4" />
               <span>Filters</span>
@@ -170,7 +162,7 @@ export function ReportsDashboard() {
                 <Download className="w-4 h-4" />
                 <span>Export</span>
               </button>
-              
+
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <button
                   onClick={handleExportCSV}
@@ -319,9 +311,8 @@ export function ReportsDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Net Balance</p>
-              <p className={`text-2xl font-bold ${
-                reports.statistics.netBalance >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <p className={`text-2xl font-bold ${reports.statistics.netBalance >= 0 ? 'text-green-600' : 'text-red-600'
+                }`}>
                 {reports.statistics.formattedStats.netBalance}
               </p>
             </div>
@@ -347,7 +338,7 @@ export function ReportsDashboard() {
       </div>
 
       {/* Charts Section */}
-      <ChartsSection 
+      <ChartsSection
         selectedPeriod={filters.period}
         onPeriodChange={handlePeriodChange}
       />
@@ -362,9 +353,8 @@ export function ReportsDashboard() {
               {reports.spending.categoryBreakdown.slice(0, 5).map((item, index) => (
                 <div key={item.category} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full bg-${
-                      ['blue', 'green', 'yellow', 'red', 'purple'][index % 5]
-                    }-500`}></div>
+                    <div className={`w-3 h-3 rounded-full bg-${['blue', 'green', 'yellow', 'red', 'purple'][index % 5]
+                      }-500`}></div>
                     <span className="text-sm font-medium text-gray-700">{item.category}</span>
                   </div>
                   <div className="text-right">
@@ -401,11 +391,10 @@ export function ReportsDashboard() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full ${
-                        item.budgeted > 0 && item.spent > item.budgeted
+                      className={`h-2 rounded-full ${item.budgeted > 0 && item.spent > item.budgeted
                           ? 'bg-red-500'
                           : 'bg-blue-500'
-                      }`}
+                        }`}
                       style={{
                         width: `${item.budgeted > 0 ? Math.min((item.spent / item.budgeted) * 100, 100) : 0}%`
                       }}

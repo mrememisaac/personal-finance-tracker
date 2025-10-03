@@ -1,5 +1,5 @@
-import type { AppState, AppAction } from '../../shared/types';
-import type { Budget } from './Budget';
+import type { AppState, AppAction, Budget as IBudget } from '../../shared/types';
+import { Budget } from './Budget';
 import type { TransactionService } from '../transaction/TransactionService';
 
 export interface BudgetAlert {
@@ -12,18 +12,23 @@ export interface BudgetAlert {
 
 export class BudgetService {
   private transactionService?: TransactionService;
+  state: AppState;
+  dispatch: React.Dispatch<AppAction>;
 
   constructor(
-    private state: AppState,
-    private dispatch: React.Dispatch<AppAction>
-  ) {}
+    state: AppState,
+    dispatch: React.Dispatch<AppAction>
+  ) {
+    this.state = state;
+    this.dispatch = dispatch;
+  }
 
   setTransactionService(transactionService: TransactionService) {
     this.transactionService = transactionService;
   }
 
-  createBudget(budget: Omit<Budget, 'id' | 'createdAt' | 'updatedAt'>): Budget {
-    const newBudget: Budget = {
+  createBudget(budget: Omit<IBudget, 'id' | 'createdAt' | 'updatedAt'>): Budget {
+    const newBudgetData: IBudget = {
       ...budget,
       id: crypto.randomUUID(),
       createdAt: new Date(),
@@ -32,10 +37,10 @@ export class BudgetService {
 
     this.dispatch({
       type: 'ADD_BUDGET',
-      payload: newBudget,
+      payload: newBudgetData,
     });
 
-    return newBudget;
+    return new Budget(newBudgetData);
   }
 
   updateBudget(id: string, updates: Partial<Budget>): Budget | null {
@@ -47,7 +52,8 @@ export class BudgetService {
       payload: { id, updates: { ...updates, updatedAt: new Date() } },
     });
 
-    return { ...existingBudget, ...updates, updatedAt: new Date() };
+    const updatedBudgetData = { ...existingBudget, ...updates, updatedAt: new Date() };
+    return new Budget(updatedBudgetData);
   }
 
   deleteBudget(id: string): boolean {
@@ -63,11 +69,13 @@ export class BudgetService {
   }
 
   getBudgets(): Budget[] {
-    return [...this.state.budgets].sort((a, b) => a.category.localeCompare(b.category));
+    return [...this.state.budgets].sort((a, b) => a.category.localeCompare(b.category))
+      .map(budget => new Budget(budget));
   }
 
   getBudgetByCategory(category: string): Budget | undefined {
-    return this.state.budgets.find(b => b.category === category && b.isActive);
+    const budget = this.state.budgets.find(b => b.category === category && b.isActive);
+    return budget ? new Budget(budget) : undefined;
   }
 
   calculateBudgetProgress(budgetId: string): {
@@ -108,14 +116,14 @@ export class BudgetService {
     return transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
   }
 
-  updateBudgetProgress(category: string, amount: number): void {
+  updateBudgetProgress(category: string): void {
     const budget = this.getBudgetByCategory(category);
     if (!budget) return;
 
     // Budget progress is calculated dynamically, no need to store it
     // This method can be used to trigger alerts or notifications
     const progress = this.calculateBudgetProgress(budget.id);
-    
+
     if (progress.status === 'warning' || progress.status === 'danger') {
       // Could emit an event or show a notification here
       console.log(`Budget alert for ${category}: ${progress.percentage.toFixed(1)}% used`);
@@ -129,7 +137,7 @@ export class BudgetService {
       .filter(b => b.isActive)
       .forEach(budget => {
         const progress = this.calculateBudgetProgress(budget.id);
-        
+
         if (progress.percentage >= 100) {
           alerts.push({
             budgetId: budget.id,
@@ -154,7 +162,7 @@ export class BudgetService {
 
   resetBudgetsForNewPeriod(): void {
     const now = new Date();
-    
+
     this.state.budgets
       .filter(b => b.isActive && b.endDate < now)
       .forEach(budget => {
@@ -188,7 +196,7 @@ export class BudgetService {
   } {
     const budgets = this.getBudgets();
     const activeBudgets = budgets.filter(b => b.isActive);
-    
+
     let totalLimit = 0;
     let totalSpent = 0;
     let overBudgetCount = 0;

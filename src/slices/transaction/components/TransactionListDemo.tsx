@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { AppProvider } from '../../../shared/context/AppContext';

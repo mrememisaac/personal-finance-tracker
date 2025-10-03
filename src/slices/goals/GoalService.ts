@@ -1,14 +1,19 @@
-import type { AppState, AppAction } from '../../shared/types';
-import type { Goal } from './Goal';
+import type { AppState, AppAction, Goal as IGoal } from '../../shared/types';
+import { Goal } from './Goal';
 import type { AccountService } from '../accounts/AccountService';
 
 export class GoalService {
   private accountService?: AccountService;
+  state: AppState;
+  dispatch: React.Dispatch<AppAction>;
 
   constructor(
-    private state: AppState,
-    private dispatch: React.Dispatch<AppAction>
-  ) {}
+    state: AppState,
+    dispatch: React.Dispatch<AppAction>
+  ) {
+    this.state = state;
+    this.dispatch = dispatch;
+  }
 
   setAccountService(accountService: AccountService) {
     this.accountService = accountService;
@@ -31,16 +36,18 @@ export class GoalService {
     return newGoal;
   }
 
-  updateGoal(id: string, updates: Partial<Goal>): Goal | null {
+  updateGoal(id: string, updates: Partial<IGoal>): Goal | null {
     const existingGoal = this.state.goals.find(g => g.id === id);
     if (!existingGoal) return null;
+
+    const updatedGoalData = { ...existingGoal, ...updates, updatedAt: new Date() };
 
     this.dispatch({
       type: 'UPDATE_GOAL',
       payload: { id, updates: { ...updates, updatedAt: new Date() } },
     });
 
-    return { ...existingGoal, ...updates, updatedAt: new Date() };
+    return new Goal(updatedGoalData);
   }
 
   deleteGoal(id: string): boolean {
@@ -62,11 +69,12 @@ export class GoalService {
         return a.isCompleted ? 1 : -1;
       }
       return a.targetDate.getTime() - b.targetDate.getTime();
-    });
+    }).map(goal => new Goal(goal));
   }
 
   getGoalById(id: string): Goal | undefined {
-    return this.state.goals.find(g => g.id === id);
+    const goal = this.state.goals.find(g => g.id === id);
+    return goal ? new Goal(goal) : undefined;
   }
 
   calculateGoalProgress(goalId: string): {
@@ -99,7 +107,7 @@ export class GoalService {
     const progress = goal.targetAmount > 0 ? (currentAmount / goal.targetAmount) * 100 : 0;
     const remainingAmount = Math.max(0, goal.targetAmount - currentAmount);
     const isCompleted = currentAmount >= goal.targetAmount;
-    
+
     const now = new Date();
     const daysRemaining = Math.max(0, Math.ceil((goal.targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
@@ -108,7 +116,7 @@ export class GoalService {
     if (!isCompleted && remainingAmount > 0) {
       const daysSinceCreation = Math.max(1, Math.ceil((now.getTime() - goal.createdAt.getTime()) / (1000 * 60 * 60 * 24)));
       const averageDailyProgress = currentAmount / daysSinceCreation;
-      
+
       if (averageDailyProgress > 0) {
         const daysToCompletion = remainingAmount / averageDailyProgress;
         projectedCompletionDate = new Date(now.getTime() + (daysToCompletion * 24 * 60 * 60 * 1000));
@@ -153,13 +161,13 @@ export class GoalService {
     const goals = this.getGoals();
     const completedGoals = goals.filter(g => g.isCompleted).length;
     const activeGoals = goals.filter(g => !g.isCompleted).length;
-    
+
     let totalTargetAmount = 0;
     let totalCurrentAmount = 0;
 
     goals.forEach(goal => {
       totalTargetAmount += goal.targetAmount;
-      
+
       // Use account balance if available, otherwise use stored current amount
       let currentAmount = goal.currentAmount;
       if (this.accountService && goal.accountId) {
@@ -189,7 +197,8 @@ export class GoalService {
 
     return this.state.goals
       .filter(goal => !goal.isCompleted && goal.targetDate >= now && goal.targetDate <= futureDate)
-      .sort((a, b) => a.targetDate.getTime() - b.targetDate.getTime());
+      .sort((a, b) => a.targetDate.getTime() - b.targetDate.getTime())
+      .map(goal => new Goal(goal));
   }
 
   validateGoalData(goal: Partial<Goal>): { isValid: boolean; errors: string[] } {

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
     Filter,
     Search,
-    Calendar,
     Tag,
     TrendingUp,
     TrendingDown,
@@ -19,14 +18,10 @@ import { useAppContext } from '../../../shared/context/AppContext';
 import { TransactionService } from '../services/TransactionService';
 import { Transaction } from '../Transaction';
 import {
-    formatCurrency,
-    formatDate,
     debounce,
     getDateFilter
 } from '../../../shared/utils';
 import {
-    DEFAULT_EXPENSE_CATEGORIES,
-    DEFAULT_INCOME_CATEGORIES,
     DATE_PERIODS
 } from '../../../shared/constants';
 import type {

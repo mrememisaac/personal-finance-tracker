@@ -25,12 +25,10 @@ export interface GoalNotification {
 export class GoalService {
   private goals: Goal[] = [];
   private accounts: Account[] = [];
-  private transactions: Transaction[] = [];
 
-  constructor(goals: IGoal[] = [], accounts: Account[] = [], transactions: Transaction[] = []) {
+  constructor(goals: IGoal[] = [], accounts: Account[] = []) {
     this.goals = goals.map(goal => new Goal(goal));
     this.accounts = accounts;
-    this.transactions = transactions;
     this.updateAllGoalProgress();
   }
 
@@ -123,8 +121,8 @@ export class GoalService {
     this.updateAllGoalProgress();
   }
 
-  updateTransactions(transactions: Transaction[]): void {
-    this.transactions = transactions;
+  updateTransactions(_transactions: Transaction[]): void {
+    // TODO: Store and use transactions when implementing transaction-based progress
     this.updateAllGoalProgress();
   }
 
@@ -290,6 +288,8 @@ export class GoalService {
 
     // Optionally create a transaction record for the contribution
     if (description) {
+      // TODO: Create transaction record when transaction service is available
+      /*
       const transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> = {
         date: new Date(),
         amount: amount,
@@ -299,6 +299,7 @@ export class GoalService {
         type: 'income',
         tags: ['goal-contribution', `goal-${goalId}`]
       };
+      */
 
       // In a real app, this would be handled by the transaction service
       // For now, we'll just update the goal

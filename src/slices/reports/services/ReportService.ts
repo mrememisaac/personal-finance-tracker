@@ -1,4 +1,4 @@
-import type { 
+import type {
   Transaction as ITransaction,
   Account,
   Budget,
@@ -13,11 +13,9 @@ import type {
   ChartType
 } from '../../../shared/types';
 import { Transaction } from '../../transaction/Transaction';
-import { 
-  formatCurrency, 
+import {
+  formatCurrency,
   getDateFilter,
-  getCurrentMonthRange,
-  getCurrentWeekRange,
   isDateInRange,
   groupBy,
   sumBy
@@ -55,15 +53,15 @@ export class ReportService {
   generateSpendingReport(dateRange: DateRange): SpendingReport {
     const transactions = this.getFilteredTransactions({ dateRange });
     const expenses = transactions.filter(t => t.isExpense);
-    
+
     const totalSpent = Math.abs(sumBy(expenses, 'amount'));
-    
+
     // Group expenses by category
     const categoryGroups = groupBy(expenses, 'category');
     const categoryBreakdown = Object.entries(categoryGroups).map(([category, txns]) => {
       const amount = Math.abs(sumBy(txns, 'amount'));
       const percentage = totalSpent > 0 ? (amount / totalSpent) * 100 : 0;
-      
+
       return {
         category,
         amount,
@@ -83,7 +81,7 @@ export class ReportService {
    */
   generateIncomeVsExpenseReport(dateRange: DateRange): ComparisonReport {
     const transactions = this.getFilteredTransactions({ dateRange });
-    
+
     const income = sumBy(transactions.filter(t => t.isIncome), 'amount');
     const expenses = Math.abs(sumBy(transactions.filter(t => t.isExpense), 'amount'));
     const netBalance = income - expenses;
@@ -103,22 +101,22 @@ export class ReportService {
     const transactions = this.getFilteredTransactions({ dateRange });
     const budgets = this.getBudgets();
     const expenses = transactions.filter(t => t.isExpense);
-    
+
     // Group expenses by category
     const categoryGroups = groupBy(expenses, 'category');
-    
+
     const categories = Object.entries(categoryGroups).map(([category, txns]) => {
       const spent = Math.abs(sumBy(txns, 'amount'));
-      
+
       // Find matching budget for this category
-      const budget = budgets.find(b => 
-        b.category === category && 
+      const budget = budgets.find(b =>
+        b.category === category &&
         b.isActive &&
         this.isBudgetActiveInPeriod(b, dateRange)
       );
-      
+
       const budgeted = budget ? budget.limit : 0;
-      
+
       return {
         name: category,
         spent,
@@ -148,7 +146,7 @@ export class ReportService {
 
     // Apply date range filter if provided
     if (dateRange) {
-      transactions = transactions.filter(t => 
+      transactions = transactions.filter(t =>
         isDateInRange(t.date, dateRange.start, dateRange.end)
       );
     }
@@ -175,7 +173,7 @@ export class ReportService {
    */
   getMonthlyTrendsChartData(months: number = 12): ChartData {
     const trends = this.getMonthlyTrends(months);
-    
+
     return {
       labels: trends.map(t => `${t.month} ${t.year}`),
       datasets: [
@@ -183,13 +181,13 @@ export class ReportService {
           label: 'Income',
           data: trends.map(t => t.income),
           borderColor: '#10b981',
-          backgroundColor: '#10b981'
+          backgroundColor: ['#10b981']
         },
         {
           label: 'Expenses',
           data: trends.map(t => t.expenses),
           borderColor: '#ef4444',
-          backgroundColor: '#ef4444'
+          backgroundColor: ['#ef4444']
         }
       ]
     };
@@ -200,7 +198,7 @@ export class ReportService {
    */
   getExpenseDistributionChartData(dateRange: DateRange): ChartData {
     const spendingReport = this.generateSpendingReport(dateRange);
-    
+
     const colors = [
       '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4',
       '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#84cc16'
@@ -221,7 +219,7 @@ export class ReportService {
    */
   getIncomeVsExpensesChartData(dateRange: DateRange): ChartData {
     const report = this.generateIncomeVsExpenseReport(dateRange);
-    
+
     return {
       labels: ['Income', 'Expenses'],
       datasets: [{
@@ -255,7 +253,7 @@ export class ReportService {
    */
   exportSpendingReportCSV(dateRange: DateRange): string {
     const report = this.generateSpendingReport(dateRange);
-    
+
     const headers = ['Category', 'Amount', 'Percentage'];
     const rows = report.categoryBreakdown.map(item => [
       item.category,
@@ -265,7 +263,7 @@ export class ReportService {
 
     // Add summary row
     rows.unshift(['Total Spent', report.totalSpent.toString(), '100%']);
-    
+
     return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
   }
 
@@ -274,14 +272,14 @@ export class ReportService {
    */
   exportComparisonReportCSV(dateRange: DateRange): string {
     const report = this.generateIncomeVsExpenseReport(dateRange);
-    
+
     const data = [
       ['Metric', 'Amount'],
       ['Income', report.income.toString()],
       ['Expenses', report.expenses.toString()],
       ['Net Balance', report.netBalance.toString()]
     ];
-    
+
     return data.map(row => row.join(',')).join('\n');
   }
 
@@ -290,7 +288,7 @@ export class ReportService {
    */
   exportCategoryReportCSV(dateRange: DateRange): string {
     const report = this.generateCategoryReport(dateRange);
-    
+
     const headers = ['Category', 'Spent', 'Budgeted', 'Difference'];
     const rows = report.categories.map(item => [
       item.name,
@@ -298,7 +296,7 @@ export class ReportService {
       item.budgeted.toString(),
       (item.budgeted - item.spent).toString()
     ]);
-    
+
     return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
   }
 
@@ -314,7 +312,7 @@ export class ReportService {
         format: 'json'
       }
     };
-    
+
     return JSON.stringify(exportData, null, 2);
   }
 
@@ -325,7 +323,7 @@ export class ReportService {
     const spendingReport = this.generateSpendingReport(dateRange);
     const comparisonReport = this.generateIncomeVsExpenseReport(dateRange);
     const categoryReport = this.generateCategoryReport(dateRange);
-    
+
     if (format === 'json') {
       const comprehensiveData = {
         period: dateRange,
@@ -341,22 +339,22 @@ export class ReportService {
           categoryCount: spendingReport.categoryBreakdown.length
         }
       };
-      
+
       return JSON.stringify(comprehensiveData, null, 2);
     } else {
       // CSV format - combine all reports
       let csvContent = '=== FINANCIAL SUMMARY ===\n';
       csvContent += `Period: ${dateRange.start.toDateString()} to ${dateRange.end.toDateString()}\n\n`;
-      
+
       csvContent += '=== INCOME VS EXPENSES ===\n';
       csvContent += this.exportComparisonReportCSV(dateRange) + '\n\n';
-      
+
       csvContent += '=== SPENDING BY CATEGORY ===\n';
       csvContent += this.exportSpendingReportCSV(dateRange) + '\n\n';
-      
+
       csvContent += '=== BUDGET COMPARISON ===\n';
       csvContent += this.exportCategoryReportCSV(dateRange) + '\n';
-      
+
       return csvContent;
     }
   }
@@ -375,7 +373,7 @@ export class ReportService {
 
     // Apply date range filter
     if (filters.dateRange) {
-      transactions = transactions.filter(t => 
+      transactions = transactions.filter(t =>
         isDateInRange(t.date, filters.dateRange!.start, filters.dateRange!.end)
       );
     }
@@ -383,26 +381,26 @@ export class ReportService {
     // Apply period filter
     if (filters.period) {
       const dateRange = getDateFilter(filters.period);
-      transactions = transactions.filter(t => 
+      transactions = transactions.filter(t =>
         isDateInRange(t.date, dateRange.start, dateRange.end)
       );
     }
 
     // Apply other filters
     if (filters.categories && filters.categories.length > 0) {
-      transactions = transactions.filter(t => 
+      transactions = transactions.filter(t =>
         filters.categories!.includes(t.category)
       );
     }
 
     if (filters.types && filters.types.length > 0) {
-      transactions = transactions.filter(t => 
+      transactions = transactions.filter(t =>
         filters.types!.includes(t.type)
       );
     }
 
     if (filters.accounts && filters.accounts.length > 0) {
-      transactions = transactions.filter(t => 
+      transactions = transactions.filter(t =>
         filters.accounts!.includes(t.accountId)
       );
     }
@@ -440,7 +438,7 @@ export class ReportService {
     for (let i = months - 1; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
-      
+
       const start = new Date(date.getFullYear(), date.getMonth(), 1);
       const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
       end.setHours(23, 59, 59, 999);
@@ -519,26 +517,26 @@ export class ReportService {
     const income = sumBy(transactions.filter(t => t.isIncome), 'amount');
     const expenses = Math.abs(sumBy(transactions.filter(t => t.isExpense), 'amount'));
     const netBalance = income - expenses;
-    
+
     const expenseTransactions = transactions.filter(t => t.isExpense);
     const incomeTransactions = transactions.filter(t => t.isIncome);
-    
-    const largestExpense = expenseTransactions.length > 0 
+
+    const largestExpense = expenseTransactions.length > 0
       ? Math.abs(Math.min(...expenseTransactions.map(t => t.amount)))
       : 0;
-    
-    const largestIncome = incomeTransactions.length > 0 
+
+    const largestIncome = incomeTransactions.length > 0
       ? Math.max(...incomeTransactions.map(t => t.amount))
       : 0;
-    
-    const averageTransaction = transactions.length > 0 
+
+    const averageTransaction = transactions.length > 0
       ? Math.abs(sumBy(transactions, 'amount')) / transactions.length
       : 0;
-    
+
     // Find most active category
     const categoryGroups = groupBy(transactions, 'category');
     const mostActiveCategory = Object.entries(categoryGroups)
-      .sort(([,a], [,b]) => b.length - a.length)[0]?.[0] || 'None';
+      .sort(([, a], [, b]) => b.length - a.length)[0]?.[0] || 'None';
 
     return {
       totalTransactions: transactions.length,

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { AuthPage } from './AuthPage';
 

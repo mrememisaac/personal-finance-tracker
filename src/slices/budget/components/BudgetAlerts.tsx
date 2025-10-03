@@ -17,7 +17,7 @@ interface AlertItemProps {
   isAnimating?: boolean;
 }
 
-const AlertItem: React.FC<AlertItemProps> = ({ alert, onDismiss, isAnimating = false }) => {
+const AlertItem: React.FC<AlertItemProps> = ({ alert, onDismiss }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   const handleDismiss = () => {
@@ -41,7 +41,7 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert, onDismiss, isAnimating = f
   const getAlertStyles = () => {
     const baseStyles = "border rounded-lg p-4 transition-all duration-300 ease-in-out";
     const visibilityStyles = isVisible ? "opacity-100 transform translate-x-0" : "opacity-0 transform translate-x-full";
-    
+
     switch (alert.severity) {
       case 'danger':
         return `${baseStyles} ${visibilityStyles} bg-red-50 border-red-200`;
@@ -75,11 +75,10 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert, onDismiss, isAnimating = f
               <h4 className={`text-sm font-medium ${getTextStyles()}`}>
                 {alert.category} Budget Alert
               </h4>
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                alert.severity === 'danger' 
-                  ? 'bg-red-100 text-red-700' 
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${alert.severity === 'danger'
+                  ? 'bg-red-100 text-red-700'
                   : 'bg-yellow-100 text-yellow-700'
-              }`}>
+                }`}>
                 {alert.severity === 'danger' ? 'Over Budget' : 'Warning'}
               </span>
             </div>
@@ -91,11 +90,10 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert, onDismiss, isAnimating = f
         {onDismiss && (
           <button
             onClick={handleDismiss}
-            className={`flex-shrink-0 ml-4 p-1 rounded-full hover:bg-opacity-20 transition-colors ${
-              alert.severity === 'danger' 
-                ? 'hover:bg-red-600 text-red-400 hover:text-red-600' 
+            className={`flex-shrink-0 ml-4 p-1 rounded-full hover:bg-opacity-20 transition-colors ${alert.severity === 'danger'
+                ? 'hover:bg-red-600 text-red-400 hover:text-red-600'
                 : 'hover:bg-yellow-600 text-yellow-400 hover:text-yellow-600'
-            }`}
+              }`}
             title="Dismiss alert"
           >
             <X className="w-4 h-4" />
@@ -163,23 +161,22 @@ const BudgetAlerts: React.FC<BudgetAlertsProps> = ({
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {/* Notification Toggle */}
           {onToggleNotifications && (
             <button
               onClick={handleToggleNotifications}
-              className={`p-2 rounded-lg transition-colors ${
-                showNotifications
+              className={`p-2 rounded-lg transition-colors ${showNotifications
                   ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                   : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-              }`}
+                }`}
               title={showNotifications ? 'Disable notifications' : 'Enable notifications'}
             >
               {showNotifications ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
             </button>
           )}
-          
+
           {/* Collapse Toggle */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -187,7 +184,7 @@ const BudgetAlerts: React.FC<BudgetAlertsProps> = ({
           >
             {isCollapsed ? 'Show' : 'Hide'}
           </button>
-          
+
           {/* Dismiss All */}
           {onDismissAll && visibleAlerts.length > 1 && (
             <button
@@ -211,7 +208,7 @@ const BudgetAlerts: React.FC<BudgetAlertsProps> = ({
               onDismiss={handleDismiss}
             />
           ))}
-          
+
           {/* Warning Alerts */}
           {warningAlerts.map(alert => (
             <AlertItem
