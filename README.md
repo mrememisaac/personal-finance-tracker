@@ -1,73 +1,175 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Personal Finance Tracker
 
-Currently, two official plugins are available:
+A modern, full-featured web application for managing your personal finances, built with React, TypeScript, and Vite. This project implements the Vertical Slice Architecture (VSA) for maximum maintainability, scalability, and testability.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Accounts**: Track multiple account types (checking, savings, credit, investment)
+- **Transactions**: Record income and expenses, categorize, and tag
+- **Budgets**: Set spending limits, monitor progress, and receive alerts
+- **Goals**: Define and track financial goals
+- **Reports**: Visualize spending, trends, and generate analytics
+- **Dashboard**: Get a real-time overview of your financial health
+- **Testing**: Automated unit, integration, and component tests
+- **Authentication**: Secure login, signup, and session management
+- **Data Export**: Export data to CSV/JSON
+- **Responsive UI**: Mobile-friendly, clean design with Tailwind CSS
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🏗️ Architecture
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Vertical Slice Architecture (VSA)
+- **Feature-first organization**: Each slice (feature) contains its own models, services, components, and tests
+- **Loose coupling**: Slices communicate via injected services, not direct imports
+- **Centralized state**: Managed via React Context and reducer pattern
+- **Barrel exports**: Clean public APIs for each slice
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Example slice structure:**
+```
+src/slices/accounts/
+├── Account.ts                # Domain model
+├── AccountService.ts         # Business logic
+├── components/               # UI components
+├── services/                 # Additional services
+├── __tests__/                # Tests
+└── index.ts                  # Barrel exports
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📦 Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Frontend**: React 18+, TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Charts**: Chart.js, react-chartjs-2
+- **Testing**: Vitest, Testing Library
+- **Linting**: ESLint, TypeScript ESLint
+- **State Management**: React Context + Reducer
+
+---
+
+## 🛠️ Getting Started
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- pnpm (or npm/yarn)
+
+### Installation
+```bash
+pnpm install
 ```
+
+### Development
+```bash
+pnpm dev
+```
+
+### Build
+```bash
+pnpm build
+```
+
+### Run Tests
+```bash
+pnpm test
+```
+
+---
+
+## 🧩 Project Structure
+
+```
+├── public/                # Static assets
+├── src/
+│   ├── app/               # App shell, navigation, error boundaries
+│   ├── shared/            # Shared types, context, utilities
+│   ├── slices/            # Feature slices (accounts, transaction, budget, etc.)
+│   ├── index.css          # Global styles
+│   └── main.tsx           # App entry point
+├── package.json
+├── tailwind.config.js
+├── vite.config.ts
+├── tsconfig*.json
+└── README.md
+```
+
+---
+
+## 🧠 Key Concepts
+
+- **Domain Models**: Rich business logic in model classes (e.g., Account, Transaction)
+- **Service Layer**: Each slice exposes a service for business operations
+- **Validation**: Comprehensive validation in models and services
+- **Testing**: 50+ test files for models, services, and UI
+- **Cross-slice orchestration**: Managed via `ServiceIntegration.tsx`
+- **Type Safety**: Strong TypeScript usage throughout
+
+---
+
+## 🧪 Testing
+
+- **Unit tests**: For models and services
+- **Integration tests**: Cross-slice and service orchestration
+- **Component tests**: UI and interaction
+- **Test runner**: Vitest
+
+Run all tests:
+```bash
+pnpm test
+```
+
+---
+
+## 🔒 Security
+- Authentication and session management via the `auth` slice
+- Validation and error handling in all user input paths
+
+---
+
+## 📈 Analytics & Reporting
+- Visualize spending by category, trends, and net worth
+- Export reports to CSV/JSON
+
+---
+
+## 📚 Documentation
+- **VSA.md**: In-depth architecture and best practices analysis
+- **Slice-level docs**: (Recommended) Add `README.md` to each slice for feature-specific details
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Commit your changes
+4. Push to your fork
+5. Open a Pull Request
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙏 Acknowledgements
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide Icons](https://lucide.dev/)
+- [Chart.js](https://www.chartjs.org/)
+- [Vitest](https://vitest.dev/)
+
+---
+
+## 📣 Contact
+
+For questions, suggestions, or support, please open an issue or contact the maintainer.
