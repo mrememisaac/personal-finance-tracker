@@ -113,7 +113,7 @@ export function AccountList({
     filtered.sort((a, b) => {
       let aVal: any;
       let bVal: any;
-      
+
       if (filters.sortBy === 'createdAt') {
         const aAccount = accounts.find(acc => acc.id === a.id);
         const bAccount = accounts.find(acc => acc.id === b.id);
