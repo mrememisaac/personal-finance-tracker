@@ -55,7 +55,7 @@ export class GoalService {
     const goal = Goal.create(goalData);
     this.goals.push(goal);
     this.updateGoalProgress(goal.id);
-    
+
     return goal;
   }
 
@@ -143,7 +143,7 @@ export class GoalService {
     // For savings goals, the current amount should reflect the account balance
     // or a portion of it dedicated to this goal
     const dedicatedAmount = this.calculateDedicatedAmount(goal, account);
-    
+
     if (dedicatedAmount !== goal.currentAmount) {
       goal.setCurrentAmount(dedicatedAmount);
     }
@@ -153,19 +153,19 @@ export class GoalService {
     // For now, we'll use a simple approach where the current amount
     // is based on the account balance, but in a real app this might
     // involve more complex logic to track dedicated savings
-    
+
     // If this is the only goal for this account, use the full balance
     const goalsForAccount = this.getGoalsByAccount(account.id).filter(g => !g.isCompleted);
-    
+
     if (goalsForAccount.length === 1) {
       return Math.min(account.balance, goal.targetAmount);
     }
-    
+
     // If multiple goals, distribute proportionally based on target amounts
     const totalTargetAmount = goalsForAccount.reduce((sum, g) => sum + g.targetAmount, 0);
     const goalProportion = goal.targetAmount / totalTargetAmount;
     const dedicatedAmount = account.balance * goalProportion;
-    
+
     return Math.min(dedicatedAmount, goal.targetAmount);
   }
 
@@ -328,14 +328,14 @@ export class GoalService {
   getOverallProgress(): number {
     const totalTarget = this.getTotalGoalAmount();
     const totalCurrent = this.getTotalCurrentAmount();
-    
+
     if (totalTarget === 0) return 0;
     return Math.min(100, (totalCurrent / totalTarget) * 100);
   }
 
   // Category and account management
   getGoalsByTargetDateRange(startDate: Date, endDate: Date): Goal[] {
-    return this.goals.filter(goal => 
+    return this.goals.filter(goal =>
       goal.targetDate >= startDate && goal.targetDate <= endDate
     );
   }
@@ -343,8 +343,8 @@ export class GoalService {
   getUpcomingGoals(days: number = 30): Goal[] {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + days);
-    
-    return this.getActiveGoals().filter(goal => 
+
+    return this.getActiveGoals().filter(goal =>
       goal.targetDate <= futureDate
     ).sort((a, b) => a.targetDate.getTime() - b.targetDate.getTime());
   }
@@ -403,7 +403,7 @@ export class GoalService {
   } {
     const activeGoals = this.getActiveGoals();
     const completedGoals = this.getCompletedGoals();
-    
+
     const totalDaysRemaining = activeGoals.reduce((sum, goal) => sum + goal.daysRemaining, 0);
     const totalProgress = this.goals.reduce((sum, goal) => sum + goal.progress, 0);
 

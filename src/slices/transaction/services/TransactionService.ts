@@ -1,13 +1,13 @@
-import type { 
-  Transaction as ITransaction, 
-  TransactionFilters, 
+import type {
+  Transaction as ITransaction,
+  TransactionFilters,
   ValidationResult,
-  AppAction 
+  AppAction
 } from '../../../shared/types';
 import { Transaction } from '../Transaction';
-import { 
-  formatCurrency, 
-  getCurrentMonthRange, 
+import {
+  formatCurrency,
+  getCurrentMonthRange,
   getCurrentWeekRange,
   isDateInRange,
   groupBy,
@@ -34,14 +34,14 @@ export class TransactionService {
   addTransaction(transactionData: Omit<ITransaction, 'id' | 'createdAt' | 'updatedAt'>): ValidationResult & { transaction?: Transaction } {
     // Validate the transaction data
     const validation = Transaction.validate(transactionData as Partial<ITransaction>);
-    
+
     if (!validation.isValid) {
       return validation;
     }
 
     // Create new transaction with generated metadata
     const transaction = Transaction.create(transactionData);
-    
+
     // Dispatch action to add to global state
     this.dispatch({
       type: 'ADD_TRANSACTION',
@@ -61,7 +61,7 @@ export class TransactionService {
   updateTransaction(id: string, updates: Partial<ITransaction>): ValidationResult & { transaction?: Transaction } {
     const transactions = this.getTransactions();
     const existingTransaction = transactions.find(t => t.id === id);
-    
+
     if (!existingTransaction) {
       return {
         isValid: false,
@@ -72,7 +72,7 @@ export class TransactionService {
     // Merge existing data with updates for validation
     const updatedData = { ...existingTransaction, ...updates };
     const validation = Transaction.validate(updatedData);
-    
+
     if (!validation.isValid) {
       return validation;
     }
@@ -98,7 +98,7 @@ export class TransactionService {
   deleteTransaction(id: string): ValidationResult {
     const transactions = this.getTransactions();
     const existingTransaction = transactions.find(t => t.id === id);
-    
+
     if (!existingTransaction) {
       return {
         isValid: false,
@@ -123,7 +123,7 @@ export class TransactionService {
   getTransaction(id: string): Transaction | null {
     const transactions = this.getTransactions();
     const transactionData = transactions.find(t => t.id === id);
-    
+
     return transactionData ? new Transaction(transactionData) : null;
   }
 
@@ -159,28 +159,28 @@ export class TransactionService {
 
     // Date range filter
     if (filters.dateRange) {
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         isDateInRange(t.date, filters.dateRange!.start, filters.dateRange!.end)
       );
     }
 
     // Category filter
     if (filters.categories && filters.categories.length > 0) {
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         filters.categories!.includes(t.category)
       );
     }
 
     // Type filter
     if (filters.types && filters.types.length > 0) {
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         filters.types!.includes(t.type)
       );
     }
 
     // Account filter
     if (filters.accounts && filters.accounts.length > 0) {
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         filters.accounts!.includes(t.accountId)
       );
     }
@@ -232,7 +232,7 @@ export class TransactionService {
   getTransactionsByCategory(filters?: TransactionFilters): Map<string, Transaction[]> {
     const transactions = this.getFilteredTransactions(filters);
     const grouped = groupBy(transactions, 'category');
-    
+
     return new Map(Object.entries(grouped));
   }
 
@@ -257,7 +257,7 @@ export class TransactionService {
 
     categoryMap.forEach((transactions, category) => {
       const expenses = transactions.filter(t => t.isExpense);
-      
+
       // Only include categories that have expenses
       if (expenses.length > 0) {
         const totalSpent = sumBy(expenses, 'amount');
@@ -354,7 +354,7 @@ export class TransactionService {
    */
   exportToCSV(transactions?: Transaction[]): string {
     const txns = transactions || this.getFilteredTransactions();
-    
+
     if (txns.length === 0) {
       return 'No transactions to export';
     }
@@ -387,7 +387,7 @@ export class TransactionService {
 
     // Combine headers and rows
     const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
-    
+
     return csvContent;
   }
 
@@ -396,7 +396,7 @@ export class TransactionService {
    */
   exportToJSON(transactions?: Transaction[]): string {
     const txns = transactions || this.getFilteredTransactions();
-    
+
     const exportData = {
       exportDate: new Date().toISOString(),
       transactionCount: txns.length,
@@ -424,7 +424,7 @@ export class TransactionService {
       return transactions;
     }
 
-    return transactions.filter(t => 
+    return transactions.filter(t =>
       t.description.toLowerCase().includes(searchTerm) ||
       t.category.toLowerCase().includes(searchTerm) ||
       (t.tags && t.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
@@ -493,7 +493,7 @@ export class TransactionService {
     for (let i = 11; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
-      
+
       const start = new Date(date.getFullYear(), date.getMonth(), 1);
       const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
       end.setHours(23, 59, 59, 999);
