@@ -18,6 +18,9 @@ import { AccountListContainer, AccountFormContainer } from './slices/accounts/co
 import { BudgetOverviewContainer, BudgetFormContainer, BudgetAlertsContainer } from './slices/budget/components';
 import { ChartsSection, ReportsDashboard } from './slices/reports/components';
 import { TestDashboard } from './slices/testing/components/TestDashboard';
+import { TransactionFormContainer } from './slices/transaction/components/TransactionFormContainer';
+import { TransactionListContainer } from './slices/transaction/components/TransactionListContainer';
+import { GoalFormContainer, GoalProgressContainer } from './slices/goals/components';
 
 function MainApp() {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
@@ -118,9 +121,9 @@ function MainApp() {
                   Set and track your financial objectives
                 </p>
               </div>
-              {/* GoalForm needs isOpen, onClose, onSubmit, accounts props */}
+              <GoalFormContainer />
             </div>
-            {/* GoalProgress needs goals and goalProgress props */}
+            <GoalProgressContainer />
           </div>
         );
 
