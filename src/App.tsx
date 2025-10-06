@@ -80,8 +80,10 @@ function MainApp() {
                 </p>
               </div>
               {/* TransactionForm needs isOpen/onClose props */}
+              <TransactionFormContainer />
             </div>
             {/* TransactionList component will be handled by container */}
+            <TransactionListContainer />
           </div>
         );
 
