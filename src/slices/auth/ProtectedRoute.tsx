@@ -21,7 +21,7 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
     const updateAuthMode = () => {
       const params = new URLSearchParams(window.location.search);
       const mode = params.get('mode');
-      
+
       // If there's a mode parameter, user is trying to auth (not landing page view)
       if (mode === 'signup' || mode === 'login') {
         setShowLanding(false);

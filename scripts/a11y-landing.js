@@ -11,13 +11,13 @@ const { window } = dom;
 window.eval(axe.source);
 
 (async () => {
-  const results = await window.axe.run(window.document);
-  console.log('Axe violations:', results.violations.length);
-  for (const v of results.violations) {
-    console.log(v.id, v.help);
-    for (const node of v.nodes) {
-      console.log(' -', node.target.join(', '));
+    const results = await window.axe.run(window.document);
+    console.log('Axe violations:', results.violations.length);
+    for (const v of results.violations) {
+        console.log(v.id, v.help);
+        for (const node of v.nodes) {
+            console.log(' -', node.target.join(', '));
+        }
     }
-  }
-  process.exit(results.violations.length > 0 ? 1 : 0);
+    process.exit(results.violations.length > 0 ? 1 : 0);
 })();
