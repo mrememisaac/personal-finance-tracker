@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Wallet, Settings } from 'lucide-react';
 import { AuthProvider, ProtectedRoute, UserMenu } from './slices/auth';
+import { lazy, Suspense } from 'react';
+const LandingPage = lazy(() => import('./shared/components/LandingPage'));
 import { AppProvider } from './shared/context/AppContext';
 import { ErrorBoundary } from './app/ErrorBoundary';
 import { Navigation } from './app/Navigation';
@@ -253,9 +255,11 @@ function App() {
         <AuthProvider>
           <AppProvider>
             <ServiceProvider>
-              <ProtectedRoute>
-                <MainApp />
-              </ProtectedRoute>
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+                <ProtectedRoute fallback={<LandingPage /> }>
+                  <MainApp />
+                </ProtectedRoute>
+              </Suspense>
             </ServiceProvider>
           </AppProvider>
         </AuthProvider>
