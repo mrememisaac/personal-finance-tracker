@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { Wallet } from 'lucide-react';
+import { Wallet, Settings } from 'lucide-react';
 import { AuthProvider, ProtectedRoute, UserMenu } from './slices/auth';
 import { AppProvider } from './shared/context/AppContext';
 import { ErrorBoundary } from './app/ErrorBoundary';
 import { Navigation } from './app/Navigation';
 import type { TabId } from './app/Navigation';
 import { ServiceProvider } from './app/ServiceIntegration';
+import { AccessibilityProvider } from './shared/components/AccessibilityProvider';
+import { SkipLink } from './shared/components/SkipLink';
+import { ToastContainer } from './shared/components/Toast';
+import { AccessibilitySettings } from './shared/components/AccessibilitySettings';
+import { useToast } from './shared/hooks/useToast';
 
 // Import all slice components
 import {
@@ -24,6 +29,8 @@ import { GoalFormContainer, GoalProgressContainer } from './slices/goals/compone
 
 function MainApp() {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const [showAccessibilitySettings, setShowAccessibilitySettings] = useState(false);
+  const { toasts, dismissToast } = useToast();
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -174,30 +181,67 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Skip Links */}
+      <SkipLink href="#main-content">Skip to main content</SkipLink>
+      <SkipLink href="#navigation">Skip to navigation</SkipLink>
+
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Wallet className="h-8 w-8 text-blue-600 mr-3" />
+              <Wallet className="h-8 w-8 text-blue-600 mr-3" aria-hidden="true" />
               <h1 className="text-xl font-bold text-gray-900">
                 Personal Finance Tracker
               </h1>
             </div>
-            <UserMenu />
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowAccessibilitySettings(true)}
+                className="p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md transition-colors"
+                aria-label="Open accessibility settings"
+                title="Accessibility Settings"
+              >
+                <Settings className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <UserMenu />
+            </div>
           </div>
         </div>
       </header>
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <div id="navigation">
+        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main 
+        id="main-content"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        role="main"
+        tabIndex={-1}
+      >
         <ErrorBoundary>
-          {renderTabContent()}
+          <div 
+            id={`${activeTab}-panel`}
+            role="tabpanel"
+            aria-labelledby={`${activeTab}-tab`}
+            className="animate-fade-in-up"
+          >
+            {renderTabContent()}
+          </div>
         </ErrorBoundary>
       </main>
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+
+      {/* Accessibility Settings Modal */}
+      <AccessibilitySettings
+        isOpen={showAccessibilitySettings}
+        onClose={() => setShowAccessibilitySettings(false)}
+      />
     </div>
   );
 }
@@ -205,15 +249,17 @@ function MainApp() {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <AppProvider>
-          <ServiceProvider>
-            <ProtectedRoute>
-              <MainApp />
-            </ProtectedRoute>
-          </ServiceProvider>
-        </AppProvider>
-      </AuthProvider>
+      <AccessibilityProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ServiceProvider>
+              <ProtectedRoute>
+                <MainApp />
+              </ProtectedRoute>
+            </ServiceProvider>
+          </AppProvider>
+        </AuthProvider>
+      </AccessibilityProvider>
     </ErrorBoundary>
   );
 }

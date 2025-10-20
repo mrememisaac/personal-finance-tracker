@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, Suspense, memo } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,11 +12,6 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
-import { TrendingUp, BarChart3, PieChart, Calendar } from 'lucide-react';
-import { useAppContext } from '../../../shared/context/AppContext';
-import { ReportService } from '../services/ReportService';
-import { getDateFilter } from '../../../shared/utils';
-import type { DatePeriod, ChartType } from '../../../shared/types';
 
 // Register Chart.js components
 ChartJS.register(
@@ -30,15 +25,30 @@ ChartJS.register(
   Legend,
   ArcElement
 );
+import { TrendingUp, BarChart3, PieChart, Calendar } from 'lucide-react';
+import { useAppContext } from '../../../shared/context/AppContext';
+import { ReportService } from '../services/ReportService';
+import { getDateFilter } from '../../../shared/utils';
+import type { DatePeriod, ChartType } from '../../../shared/types';
+
+// Loading component for charts
+const ChartLoading = () => (
+  <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg animate-pulse">
+    <div className="text-center">
+      <div className="w-12 h-12 bg-gray-300 rounded-full mx-auto mb-2"></div>
+      <p className="text-gray-500">Loading chart...</p>
+    </div>
+  </div>
+);
 
 interface ChartsSectionProps {
   selectedPeriod?: DatePeriod;
   onPeriodChange?: (period: DatePeriod) => void;
 }
 
-export function ChartsSection({ 
-  selectedPeriod = '30days', 
-  onPeriodChange 
+export const ChartsSection = memo(function ChartsSection({
+  selectedPeriod = '30days',
+  onPeriodChange
 }: ChartsSectionProps) {
   const { state } = useAppContext();
   const [activeChart, setActiveChart] = useState<ChartType>('line');
@@ -90,7 +100,7 @@ export function ChartsSection({
         mode: 'index' as const,
         intersect: false,
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const label = context.dataset.label || '';
             const value = new Intl.NumberFormat('en-US', {
               style: 'currency',
@@ -120,7 +130,7 @@ export function ChartsSection({
           text: 'Amount ($)'
         },
         ticks: {
-          callback: function(value: any) {
+          callback: function (value: any) {
             return new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD',
@@ -154,7 +164,7 @@ export function ChartsSection({
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const label = context.label || '';
             const value = new Intl.NumberFormat('en-US', {
               style: 'currency',
@@ -186,7 +196,7 @@ export function ChartsSection({
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const value = new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD'
@@ -204,7 +214,7 @@ export function ChartsSection({
           text: 'Amount ($)'
         },
         ticks: {
-          callback: function(value: any) {
+          callback: function (value: any) {
             return new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD',
@@ -233,29 +243,26 @@ export function ChartsSection({
 
   const renderChart = () => {
     const chartContainerClass = "h-80 w-full";
-    
-    switch (activeChart) {
-      case 'line':
-        return (
+
+    return (
+      <Suspense fallback={<ChartLoading />}>
+        {activeChart === 'line' && (
           <div className={chartContainerClass}>
             <Line data={monthlyTrendsData} options={lineChartOptions} />
           </div>
-        );
-      case 'pie':
-        return (
+        )}
+        {activeChart === 'pie' && (
           <div className={chartContainerClass}>
             <Pie data={expenseDistributionData} options={pieChartOptions} />
           </div>
-        );
-      case 'bar':
-        return (
+        )}
+        {activeChart === 'bar' && (
           <div className={chartContainerClass}>
             <Bar data={incomeVsExpensesData} options={barChartOptions} />
           </div>
-        );
-      default:
-        return null;
-    }
+        )}
+      </Suspense>
+    );
   };
 
   return (
@@ -263,7 +270,7 @@ export function ChartsSection({
       {/* Header with controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
         <h2 className="text-xl font-bold text-gray-800">Financial Charts</h2>
-        
+
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
           {/* Period selector */}
           <div className="flex items-center space-x-2">
@@ -287,11 +294,10 @@ export function ChartsSection({
               <button
                 key={type.value}
                 onClick={() => setActiveChart(type.value)}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  activeChart === type.value
+                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm font-medium transition-colors ${activeChart === type.value
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
-                }`}
+                  }`}
               >
                 {type.icon}
                 <span>{type.label}</span>
@@ -323,19 +329,19 @@ export function ChartsSection({
         <div className="text-sm text-gray-600">
           {activeChart === 'line' && (
             <p>
-              <strong>Monthly Trends:</strong> Track your income and expenses over the last 12 months. 
+              <strong>Monthly Trends:</strong> Track your income and expenses over the last 12 months.
               Green line shows income, red line shows expenses. Hover over points for detailed amounts.
             </p>
           )}
           {activeChart === 'pie' && (
             <p>
-              <strong>Expense Distribution:</strong> See how your spending is distributed across different categories 
+              <strong>Expense Distribution:</strong> See how your spending is distributed across different categories
               for the selected time period. Hover over segments for detailed breakdown.
             </p>
           )}
           {activeChart === 'bar' && (
             <p>
-              <strong>Income vs Expenses:</strong> Compare your total income against total expenses 
+              <strong>Income vs Expenses:</strong> Compare your total income against total expenses
               for the selected period. Green represents income, red represents expenses.
             </p>
           )}
@@ -343,4 +349,4 @@ export function ChartsSection({
       </div>
     </div>
   );
-}
+});
