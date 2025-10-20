@@ -1,3 +1,84 @@
+/* Import animations first */
+@import './shared/styles/animations.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* High contrast mode styles */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    --tw-ring-color: #000000;
+    --tw-border-opacity: 1;
+  }
+
+  .high-contrast button:focus {
+    outline: 3px solid #000000;
+    outline-offset: 2px;
+  }
+
+  .high-contrast input:focus,
+  .high-contrast select:focus,
+  .high-contrast textarea:focus {
+    outline: 3px solid #000000;
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion styles */
+@media (prefers-reduced-motion: reduce) {
+
+  .reduced-motion *,
+  .reduced-motion *::before,
+  .reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus visible styles for better keyboard navigation */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
+
+/* Ensure proper focus styles for interactive elements */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar for better accessibility */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

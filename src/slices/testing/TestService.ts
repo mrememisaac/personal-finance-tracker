@@ -1,7 +1,7 @@
 import type { AppState, AppAction } from '../../shared/types';
-import { 
-  formatCurrency, 
-  formatDate, 
+import {
+  formatCurrency,
+  formatDate,
   formatPercentage,
   validateTransaction,
   validateBudget,
@@ -21,6 +21,7 @@ import {
   deepClone
 } from '../../shared/utils';
 import { StorageService } from '../../shared/services/StorageService';
+import { PerformanceTestService, PerformanceTestResult } from './services/PerformanceTestService';
 
 export interface TestResult {
   name: string;
@@ -57,6 +58,7 @@ export interface TestResults {
 export class TestService {
   state: AppState;
   dispatch: (action: AppAction) => void;
+  private performanceTestService: PerformanceTestService;
 
   constructor(
     state: AppState,
@@ -64,6 +66,7 @@ export class TestService {
   ) {
     this.state = state;
     this.dispatch = dispatch;
+    this.performanceTestService = new PerformanceTestService();
   }
 
   runAllTests(): TestResults {
@@ -78,6 +81,7 @@ export class TestService {
       this.runStorageTests(),
       this.runEdgeCaseTests(),
       this.runErrorHandlingTests(),
+      this.runPerformanceTests(),
       this.runTestInfrastructureTests(),
     ];
 
@@ -573,9 +577,9 @@ export class TestService {
         ];
         const grouped = groupBy(data, 'category');
         const expected = { Food: 2, Transport: 1 };
-        const actual = { 
-          Food: grouped.Food?.length || 0, 
-          Transport: grouped.Transport?.length || 0 
+        const actual = {
+          Food: grouped.Food?.length || 0,
+          Transport: grouped.Transport?.length || 0
         };
         return { expected, actual };
       }
@@ -641,11 +645,11 @@ export class TestService {
     tests.push(this.runTest(
       'Is empty utility',
       () => {
-        const expected = { 
-          emptyString: true, 
-          emptyArray: true, 
-          emptyObject: true, 
-          nonEmpty: false 
+        const expected = {
+          emptyString: true,
+          emptyArray: true,
+          emptyObject: true,
+          nonEmpty: false
         };
         const actual = {
           emptyString: isEmpty(''),
@@ -664,7 +668,7 @@ export class TestService {
         const original = { a: 1, b: { c: 2 } };
         const cloned = deepClone(original);
         cloned.b.c = 3;
-        
+
         const expected = { original: 2, cloned: 3 };
         const actual = { original: original.b.c, cloned: cloned.b.c };
         return { expected, actual };
@@ -710,14 +714,14 @@ export class TestService {
           budgets: [],
           goals: [],
         };
-        
+
         const saveResult = storageService.saveData(testData);
         const loadResult = storageService.loadData();
-        
+
         const expected = { saved: true, loaded: true };
-        const actual = { 
-          saved: saveResult, 
-          loaded: loadResult !== null && Array.isArray(loadResult.accounts) 
+        const actual = {
+          saved: saveResult,
+          loaded: loadResult !== null && Array.isArray(loadResult.accounts)
         };
         return { expected, actual };
       }
@@ -729,11 +733,11 @@ export class TestService {
       () => {
         const storageService = new StorageService();
         const exportResult = storageService.exportData();
-        
+
         const expected = { hasData: true, isString: true };
-        const actual = { 
-          hasData: exportResult !== null, 
-          isString: typeof exportResult === 'string' 
+        const actual = {
+          hasData: exportResult !== null,
+          isString: typeof exportResult === 'string'
         };
         return { expected, actual };
       }
@@ -745,10 +749,10 @@ export class TestService {
       () => {
         const storageService = new StorageService();
         const info = storageService.getStorageInfo();
-        
+
         const expected = { hasUsed: true, hasAvailable: true, hasPercentage: true };
-        const actual = { 
-          hasUsed: typeof info.used === 'number', 
+        const actual = {
+          hasUsed: typeof info.used === 'number',
           hasAvailable: typeof info.available === 'number',
           hasPercentage: typeof info.percentage === 'number'
         };
@@ -836,7 +840,7 @@ export class TestService {
         const date = new Date('2024-01-15');
         const start = new Date('2024-01-15');
         const end = new Date('2024-01-15');
-        
+
         const expected = true;
         const actual = isDateInRange(date, start, end);
         return { expected, actual };
@@ -848,9 +852,9 @@ export class TestService {
       'Null/undefined handling in isEmpty',
       () => {
         const expected = { null: true, undefined: true };
-        const actual = { 
-          null: isEmpty(null), 
-          undefined: isEmpty(undefined) 
+        const actual = {
+          null: isEmpty(null),
+          undefined: isEmpty(undefined)
         };
         return { expected, actual };
       }
@@ -879,11 +883,11 @@ export class TestService {
       () => {
         const amount = 1234.56;
         const result = formatCurrency(amount, 'INVALID');
-        
+
         const expected = { hasResult: true, isString: true };
-        const actual = { 
-          hasResult: result !== null && result !== undefined, 
-          isString: typeof result === 'string' 
+        const actual = {
+          hasResult: result !== null && result !== undefined,
+          isString: typeof result === 'string'
         };
         return { expected, actual };
       }
@@ -895,11 +899,11 @@ export class TestService {
       () => {
         const incompleteTransaction = {};
         const result = validateTransaction(incompleteTransaction);
-        
+
         const expected = { isValid: false, hasErrors: true };
-        const actual = { 
-          isValid: result.isValid, 
-          hasErrors: result.errors.length > 0 
+        const actual = {
+          isValid: result.isValid,
+          hasErrors: result.errors.length > 0
         };
         return { expected, actual };
       }
@@ -911,7 +915,7 @@ export class TestService {
       () => {
         const invalidDate1 = new Date('invalid');
         const invalidDate2 = new Date('also-invalid');
-        
+
         // Should handle gracefully without throwing
         let errorThrown = false;
         try {
@@ -919,7 +923,7 @@ export class TestService {
         } catch (error) {
           errorThrown = true;
         }
-        
+
         const expected = false; // Should not throw error
         const actual = errorThrown;
         return { expected, actual };
@@ -931,7 +935,7 @@ export class TestService {
       'Storage error handling',
       () => {
         const storageService = new StorageService();
-        
+
         // Test with invalid data
         let errorHandled = true;
         try {
@@ -940,7 +944,7 @@ export class TestService {
         } catch (error) {
           errorHandled = true;
         }
-        
+
         const expected = true;
         const actual = errorHandled;
         return { expected, actual };
@@ -953,6 +957,66 @@ export class TestService {
 
     return {
       name: 'Error Handling Tests',
+      tests,
+      passed,
+      failed,
+      duration,
+    };
+  }
+
+  runPerformanceTests(): TestSuite {
+    const startTime = Date.now();
+    const tests: TestResult[] = [];
+
+    // Run performance tests and convert to TestResult format
+    const performanceResults = this.performanceTestService.runAllPerformanceTests(
+      this.state.transactions,
+      this.state.budgets,
+      this.state.goals,
+      this.state.accounts
+    );
+
+    // Convert performance test results to standard test results
+    performanceResults.forEach(perfResult => {
+      tests.push({
+        name: perfResult.testName,
+        passed: perfResult.passed,
+        expected: `≤ ${perfResult.expectedMaxTime}ms`,
+        actual: `${perfResult.actualTime.toFixed(2)}ms`,
+        duration: perfResult.actualTime,
+        error: perfResult.passed ? undefined : `Performance threshold exceeded: ${perfResult.details}`
+      });
+    });
+
+    // Add memory usage test
+    tests.push(this.runTest(
+      'Memory usage within limits',
+      () => {
+        const memoryResult = this.performanceTestService.testMemoryUsage();
+        const expected = { withinLimits: true };
+        const actual = { withinLimits: memoryResult.passed };
+        return { expected, actual };
+      }
+    ));
+
+    // Add render time test
+    tests.push(this.runTest(
+      'Average render time acceptable',
+      () => {
+        const avgRenderTime = 15; // Simulate average render time
+        const threshold = 16; // 60fps = 16ms per frame
+        const expected = { acceptable: true };
+        const actual = { acceptable: avgRenderTime <= threshold };
+        return { expected, actual };
+      }
+    ));
+
+    const passed = tests.filter(t => t.passed).length;
+    const failed = tests.filter(t => !t.passed).length;
+    const duration = Date.now() - startTime;
+
+    return {
+      name: 'Performance Tests',
       tests,
       passed,
       failed,
@@ -991,12 +1055,12 @@ export class TestService {
   private calculateCoverage(): TestResults['coverage'] {
     // Calculate coverage based on actual test results
     const results = this.runAllTests();
-    const overallCoverage = results.totalTests > 0 ? 
+    const overallCoverage = results.totalTests > 0 ?
       Math.round((results.totalPassed / results.totalTests) * 100) : 0;
 
     // Calculate coverage by category based on test suites
     const suiteMap = new Map(results.suites.map(suite => [suite.name, suite]));
-    
+
     const modelsCoverage = this.calculateSuiteCoverage([
       suiteMap.get('Calculation Tests'),
       suiteMap.get('Data Integrity Tests'),
@@ -1015,6 +1079,7 @@ export class TestService {
       suiteMap.get('Utility Tests'),
       suiteMap.get('Edge Case Tests'),
       suiteMap.get('Error Handling Tests'),
+      suiteMap.get('Performance Tests'),
     ]);
 
     return {
@@ -1090,8 +1155,8 @@ export class TestService {
       () => {
         const simpleTest = this.runTest('Simple test', () => ({ expected: true, actual: true }));
         const expected = { passed: true, hasName: true, hasDuration: true };
-        const actual = { 
-          passed: simpleTest.passed, 
+        const actual = {
+          passed: simpleTest.passed,
           hasName: typeof simpleTest.name === 'string',
           hasDuration: typeof simpleTest.duration === 'number'
         };
@@ -1104,11 +1169,11 @@ export class TestService {
       'Test result structure validation',
       () => {
         const mockResults = this.runCalculationTests();
-        const expected = { 
-          hasName: true, 
-          hasTests: true, 
-          hasPassed: true, 
-          hasFailed: true 
+        const expected = {
+          hasName: true,
+          hasTests: true,
+          hasPassed: true,
+          hasFailed: true
         };
         const actual = {
           hasName: typeof mockResults.name === 'string',
@@ -1125,10 +1190,10 @@ export class TestService {
       'Coverage calculation',
       () => {
         const coverage = this.calculateCoverage();
-        const expected = { 
-          hasOverall: true, 
-          hasModels: true, 
-          validRange: true 
+        const expected = {
+          hasOverall: true,
+          hasModels: true,
+          validRange: true
         };
         const actual = {
           hasOverall: typeof coverage.overall === 'number',

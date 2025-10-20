@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import type { Budget } from '../Budget';
 import type { BudgetProgress } from '../../../shared/types';
@@ -13,7 +13,7 @@ interface BudgetProgressBarProps {
   progress: BudgetProgress;
 }
 
-const BudgetProgressBar: React.FC<BudgetProgressBarProps> = ({ budget, progress }) => {
+const BudgetProgressBar = memo<BudgetProgressBarProps>(({ budget, progress }) => {
   const getStatusColor = (status: 'safe' | 'warning' | 'danger') => {
     switch (status) {
       case 'safe':
@@ -118,31 +118,43 @@ const BudgetProgressBar: React.FC<BudgetProgressBarProps> = ({ budget, progress 
       )}
     </div>
   );
-};
+});
 
-const BudgetOverview: React.FC<BudgetOverviewProps> = ({ budgets, className = '' }) => {
-  // Calculate progress for each budget
-  const budgetProgress = budgets.map(budget => ({
-    budgetId: budget.id,
-    spent: budget.spent,
-    remaining: budget.remaining,
-    percentage: budget.percentage,
-    status: budget.status
-  }));
+const BudgetOverview = memo<BudgetOverviewProps>(({ budgets, className = '' }) => {
+  // Memoize progress calculations for each budget
+  const budgetProgress = useMemo(() => 
+    budgets.map(budget => ({
+      budgetId: budget.id,
+      spent: budget.spent,
+      remaining: budget.remaining,
+      percentage: budget.percentage,
+      status: budget.status
+    })), [budgets]
+  );
 
-  // Calculate summary statistics
-  const totalBudgeted = budgets.reduce((sum, budget) => sum + budget.limit, 0);
-  const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0);
-  const totalRemaining = budgets.reduce((sum, budget) => sum + budget.remaining, 0);
-  const overallPercentage = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
+  // Memoize summary statistics
+  const summaryStats = useMemo(() => {
+    const totalBudgeted = budgets.reduce((sum, budget) => sum + budget.limit, 0);
+    const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0);
+    const totalRemaining = budgets.reduce((sum, budget) => sum + budget.remaining, 0);
+    const overallPercentage = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
 
-  const getOverallStatus = (): 'safe' | 'warning' | 'danger' => {
-    if (overallPercentage >= 100) return 'danger';
-    if (overallPercentage >= 80) return 'warning';
-    return 'safe';
-  };
+    const getOverallStatus = (): 'safe' | 'warning' | 'danger' => {
+      if (overallPercentage >= 100) return 'danger';
+      if (overallPercentage >= 80) return 'warning';
+      return 'safe';
+    };
 
-  const overallStatus = getOverallStatus();
+    return {
+      totalBudgeted,
+      totalSpent,
+      totalRemaining,
+      overallPercentage,
+      overallStatus: getOverallStatus()
+    };
+  }, [budgets]);
+
+  const { totalBudgeted, totalSpent, totalRemaining, overallPercentage, overallStatus } = summaryStats;
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -259,6 +271,6 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ budgets, className = ''
       </div>
     </div>
   );
-};
+});
 
 export { BudgetOverview };
