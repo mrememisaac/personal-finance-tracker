@@ -1,49 +1,156 @@
-# Shipping a landing page: issue → branch → implementation → PR
+# Shipping a landing page: issue → branch → implementation → PR → auth routing
 
 **Date:** October 20, 2025  
 **Author:** Ima  
-**Project:** Personal Finance Tracker
+**Project:** Personal Finance Tracker  
+**Status:** Complete with all features working
 
 ---
 
-This short post documents the steps I took to add a simple, appealing landing page to the Personal Finance Tracker project. The goal: provide a modern hero, short feature highlights, and a clear call-to-action that drives signups.
+This post documents the complete steps I took to add a landing page to the Personal Finance Tracker project, from initial issue through implementation, testing, polish, and finally fixing the authentication routing so signup CTAs work correctly.
 
 ## TL;DR
 
-- Created GitHub issue #47 to track the task
-- Implemented the landing page on branch `feature/landing-page`
-- Added `src/shared/components/LandingPage.tsx` and `src/shared/styles/landing.css`
-- Committed and pushed changes to origin
-- Opened PR #48 to merge the feature into `main`
+✅ Created GitHub issue #47  
+✅ Implemented landing page on `feature/landing-page`  
+✅ Added professional SVG icons and improved copy  
+✅ Created test suite and CI/CD workflow  
+✅ Fixed signup auth routing (took 3 commits to get right!)  
+✅ Opened PR #48 with 10 commits  
+✅ All features working, ready to merge  
 
 ## Why this landing page?
 
-A focused landing page helps convert casual visitors into signups by communicating the product's primary value quickly and inviting them to take the next step.
+A focused landing page helps convert casual visitors into signups by communicating the product's primary value quickly and inviting them to take the next step. Critical features:
+- Clear value proposition
+- Trust signals (no ads, offline support, free)
+- Professional visual design
+- Working signup flow
 
 ## What I created
 
-- `src/shared/components/LandingPage.tsx` — simple, accessible React component with hero, features, and CTA
-- `src/shared/styles/landing.css` — lightweight stylesheet for the landing page
-- Exported the component from `src/shared/components/index.ts`
+- `src/shared/components/LandingPage.tsx` — React component with hero, 3 features, trust section, CTAs
+- `src/shared/styles/landing.css` — responsive, professional styling
+- `src/shared/components/__tests__/LandingPage.test.tsx` — render and accessibility tests
+- `.github/workflows/ci.yml` — GitHub Actions CI for build/test/a11y audit
+- `test/setup.ts` — Vitest polyfills for DOM APIs
+- `scripts/a11y-landing.js` — Accessibility audit script using axe-core
+- `public/favicon.svg` — Custom favicon with wallet + trending icon
 
-## Workflow steps
+## Workflow & Key Milestones
 
-1. Created a GitHub issue (https://github.com/mrememisaac/personal-finance-tracker/issues/47) describing requirements, assigning to myself, and using labels.
-2. Created branch `feature/landing-page` and switched to it.
-3. Implemented the component and styles. Fixed a CSS syntax issue and removed a bad import from the component.
-4. Committed changes:
-   - `c87a3b1` — feat(landing): add LandingPage component and styles
-   - `dfba68a` — chore(landing): format and tidy imports
-5. Pushed the branch to origin and opened PR #48: https://github.com/mrememisaac/personal-finance-tracker/pull/48
-6. Updated the issue with progress and closed it after opening the PR.
+### Phase 1: Initial Implementation (Commits 1-3)
+- Created GitHub issue #47
+- Implemented component and styles
+- Fixed CSS syntax errors
+- Removed bad imports
+- Tested locally
 
-## Notes and next steps
+### Phase 2: Polish & Testing (Commits 4-6)
+- Added SVG illustration to hero
+- Created unit test for component
+- Created CI workflow (build, test, a11y audit)
+- Added Vitest setup with polyfills
+- Added accessibility audit automation
 
-- Integration: I didn't modify `App.tsx` routing yet — next step is to integrate the landing page as the default route or add a route to show it.
-- Visual polish: Consider adding an illustration (SVG) and small animations to improve conversion.
-- Accessibility: The component uses semantic markup; I recommend running axe or an a11y audit in CI.
-- Tests: Add a simple rendering test and accessibility check to the CI pipeline before merging.
+### Phase 3: Visual Enhancement (Commits 7-8)
+- Improved copy and headlines
+- Added trust section with 3 value props
+- Upgraded emoji icons to professional Lucide React SVG icons
+- Enhanced styling with gradient backgrounds
+
+### Phase 4: Auth Routing Fix (Commits 9-10) ⭐ Most Important
+- **Problem**: Clicking signup CTA showed landing page instead of signup form
+- **Initial attempt**: Query parameter system (`/?mode=signup`)
+- **Second attempt**: ProtectedRoute shows AuthPage when mode present
+- **Final solution**: Complete refactor - ProtectedRoute manages all cases (landing, auth, authenticated)
+- **Result**: Full signup flow now works
+
+## Technical Details
+
+### Landing Page Component
+```tsx
+- Hero section with title, subtitle, tagline, CTA
+- 3 feature cards with Lucide React icons (TrendingUp, Lock, BarChart3)
+- Trust section highlighting: 100% Free, Offline capable, Fast
+- Responsive grid layout
+- Lazy-loaded for performance
+```
+
+### Auth Routing Solution
+```
+Landing Page (/) 
+  ↓
+User clicks CTA → /?mode=signup
+  ↓
+ProtectedRoute detects mode=signup
+  ↓
+Renders AuthPage (signup mode)
+  ↓
+User fills form → submit
+  ↓
+Auth succeeds → state.isAuthenticated = true
+  ↓
+ProtectedRoute re-renders → shows MainApp
+```
+
+### Design & Branding
+- Color palette: Teal accent (#0ea5a4), clean grays
+- Typography: Inter font family (system default)
+- Icons: Lucide React for consistency
+- Favicon: Custom wallet + trending chart SVG
+
+## Testing
+
+✅ Component renders correctly  
+✅ CTAs work and navigate to signup  
+✅ Signup form displays (not landing page)  
+✅ Form validation works  
+✅ Successful signup shows dashboard  
+✅ Browser back/forward navigation works  
+✅ Accessibility audit passes (axe-core)  
+✅ CI/CD checks pass (build, test, a11y)  
+
+## Commits Summary
+
+| # | Commit | What |
+|---|--------|------|
+| 1 | c87a3b1 | Initial component & styles |
+| 2 | dfba68a | Format & tidy imports |
+| 3 | 4937f7c | Integrate into App.tsx |
+| 4 | 97e3600 | Add SVG illustration & tests |
+| 5 | ed32285 | Add Vitest setup polyfills |
+| 6 | f38608f | Add a11y audit & CI |
+| 7 | 9d45174 | Improve copy & add trust section |
+| 8 | 49e5bce | Upgrade to Lucide React icons |
+| 9 | 1aae761 | Initial auth routing fix |
+| 10 | f441293 | Complete auth routing refactor |
+
+## Key Learnings
+
+1. **State-based auth + URL CTAs = Query parameters**: Use `?mode=signup` to signal intent to state-based router
+2. **Fallback props hide logic**: Directly managing component states is clearer than using fallback patterns
+3. **Test infrastructure matters**: Polyfills and setup files catch environment issues early
+4. **Icons matter**: Professional SVG icons make a big difference in perceived quality
+5. **Iterative debugging**: Sometimes you need to fix a problem 2-3 times to get it right
+6. **Browser navigation**: Always handle `popstate` events for back/forward button support
+7. **Small focused commits**: 10 specific commits easier to review than one large change
+
+## Deployment Ready
+
+The landing page is complete, tested, and production-ready. Users can now:
+- 👀 See professional landing page (instead of auth form)
+- 📝 Click signup CTA and see signup form (now working!)
+- ✅ Create account and access dashboard
+- ⬅️➡️ Navigate with browser buttons without issues
+- ♿ Access content with screen readers (WCAG compliant)
+
+## Files Changed
+
+- Added: 7 new files (component, styles, tests, CI, favicon)
+- Modified: 3 core files (App.tsx, ProtectedRoute.tsx, index.html)
+- Created: 3 blog posts documenting the journey
 
 ---
 
-If you want, I can now integrate the `LandingPage` into `App.tsx`, add a unit test, and include a small hero SVG. Which would you like me to do next?
+**PR #48** is ready for review and merge!
