@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { TestTube, CheckCircle, XCircle, Clock, Play, Download, RefreshCw, Eye } from 'lucide-react';
-import { AppContext } from '../../../shared/context/AppContext';
+import { useAppContext } from '../../../shared/context/AppContext';
 import { TestService, type TestResults, type TestSuite } from '../TestService';
 import { AccessibilityTestDashboard } from './AccessibilityTestDashboard';
 
 export function TestDashboard() {
-  const { state, dispatch } = useContext(AppContext);
+  const { state, dispatch } = useAppContext();
   const [testResults, setTestResults] = useState<TestResults | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [selectedSuite, setSelectedSuite] = useState<string | null>(null);
@@ -465,8 +465,9 @@ export function TestDashboard() {
             </div>
           </div>
         </div>
-        )}
       )}
-    </div>
+      </div>
+    )}
+  </div>
   );
 }
