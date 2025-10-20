@@ -1,5 +1,4 @@
 // Vitest global setup for DOM polyfills and mocks
-import 'whatwg-fetch';
 
 // Polyfill URL.createObjectURL used in tests
 if (typeof (globalThis as any).URL === 'undefined') {

@@ -29,12 +29,22 @@
     align-items: center;
 }
 
-.landing-illustration svg { display:block; margin-left:auto }
+.landing-illustration svg {
+    display: block;
+    margin-left: auto
+}
 
 .landing-title {
     font-size: 2.25rem;
     margin: 0;
     color: #0f172a;
+}
+
+.landing-tagline {
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin: 0.5rem 0 1rem 0;
+    font-weight: 500;
 }
 
 .landing-subtitle {
@@ -52,6 +62,11 @@
     border-radius: 0.5rem;
     text-decoration: none;
     font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.landing-cta:hover {
+    background-color: var(--accent-600);
 }
 
 .landing-cta.secondary {
@@ -60,10 +75,14 @@
     color: var(--accent);
 }
 
+.landing-cta.secondary:hover {
+    background-color: rgba(14, 165, 164, 0.1);
+}
+
 .landing-features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
     padding: 3rem 1.5rem;
     max-width: 1100px;
     margin: 0 auto;
@@ -71,19 +90,82 @@
 
 .feature {
     background: white;
-    padding: 1.25rem;
+    padding: 1.5rem;
     border-radius: 0.5rem;
     box-shadow: 0 2px 6px rgba(2, 6, 23, 0.04);
     color: #0f172a;
 }
 
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
 .feature h3 {
     margin: 0 0 0.5rem 0;
+    color: #0f172a;
+}
+
+.feature p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.landing-section-title {
+    text-align: center;
+    font-size: 1.75rem;
+    color: #0f172a;
+    margin: 0 0 2rem 0;
+}
+
+.landing-trust {
+    background: #f9fafb;
+    padding: 3rem 1.5rem;
+    margin: 2rem 0;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.trust-item {
+    text-align: center;
+    padding: 1rem;
+}
+
+.trust-item strong {
+    display: block;
+    color: #0f172a;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.trust-item p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .landing-footer-cta {
-    padding: 2rem;
+    padding: 3rem 1.5rem;
     text-align: center;
+}
+
+.footer-cta-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.cta-note {
+    margin: 0.75rem 0 0 0;
+    font-size: 0.85rem;
+    color: var(--muted);
 }
 
 @media (min-width: 1024px) {
