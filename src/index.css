@@ -1,9 +1,9 @@
+/* Import animations first */
+@import './shared/styles/animations.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import animations */
-@import './shared/styles/animations.css';
 
 /* High contrast mode styles */
 @media (prefers-contrast: high) {
