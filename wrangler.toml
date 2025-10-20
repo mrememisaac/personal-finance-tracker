@@ -9,3 +9,10 @@ bucket = "./dist"
 # Environment variables (add your own as needed)
 # [vars]
 # PUBLIC_API_URL = "https://api.example.com"
+
+[observability]
+[observability.logs]
+enabled = false
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
