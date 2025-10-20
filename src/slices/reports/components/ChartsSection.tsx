@@ -1,37 +1,30 @@
-import React, { useMemo, useState, lazy, Suspense, memo } from 'react';
+import React, { useMemo, useState, useEffect, Suspense, memo } from 'react';
+import { 
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 
-// Lazy load Chart.js components
-const ChartComponents = lazy(async () => {
-  const {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement,
-  } = await import('chart.js');
-  
-  const { Line, Bar, Pie } = await import('react-chartjs-2');
-
-  // Register Chart.js components
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement
-  );
-
-  return { Line, Bar, Pie };
-});
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 import { TrendingUp, BarChart3, PieChart, Calendar } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { ReportService } from '../services/ReportService';
@@ -253,32 +246,21 @@ export const ChartsSection = memo(function ChartsSection({
     
     return (
       <Suspense fallback={<ChartLoading />}>
-        <ChartComponents>
-          {({ Line, Bar, Pie }) => {
-            switch (activeChart) {
-              case 'line':
-                return (
-                  <div className={chartContainerClass}>
-                    <Line data={monthlyTrendsData} options={lineChartOptions} />
-                  </div>
-                );
-              case 'pie':
-                return (
-                  <div className={chartContainerClass}>
-                    <Pie data={expenseDistributionData} options={pieChartOptions} />
-                  </div>
-                );
-              case 'bar':
-                return (
-                  <div className={chartContainerClass}>
-                    <Bar data={incomeVsExpensesData} options={barChartOptions} />
-                  </div>
-                );
-              default:
-                return null;
-            }
-          }}
-        </ChartComponents>
+        {activeChart === 'line' && (
+          <div className={chartContainerClass}>
+            <Line data={monthlyTrendsData} options={lineChartOptions} />
+          </div>
+        )}
+        {activeChart === 'pie' && (
+          <div className={chartContainerClass}>
+            <Pie data={expenseDistributionData} options={pieChartOptions} />
+          </div>
+        )}
+        {activeChart === 'bar' && (
+          <div className={chartContainerClass}>
+            <Bar data={incomeVsExpensesData} options={barChartOptions} />
+          </div>
+        )}
       </Suspense>
     );
   };
