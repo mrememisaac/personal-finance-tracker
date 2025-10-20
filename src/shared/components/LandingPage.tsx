@@ -13,7 +13,7 @@ const LandingPage: React.FC = () => {
                             <h1 className="landing-title">Your money, your control</h1>
                             <p className="landing-subtitle">Track spending, set budgets, and reach financial goals with a simple, private tool built for clarity.</p>
                             <p className="landing-tagline">No ads. No tracking. Just honest money management.</p>
-                            <a href="/auth/signup" className="landing-cta landing-cta-primary">Start for free</a>
+                            <a href="/?mode=signup" className="landing-cta landing-cta-primary">Start for free</a>
                         </div>
                         <div className="landing-illustration" aria-hidden="true">
                             <svg width="280" height="200" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
@@ -78,7 +78,7 @@ const LandingPage: React.FC = () => {
 
             <section className="landing-footer-cta">
                 <div className="footer-cta-container">
-                    <a href="/auth/signup" className="landing-cta landing-cta-primary">Get started free</a>
+                    <a href="/?mode=signup" className="landing-cta landing-cta-primary">Get started free</a>
                     <p className="cta-note">No credit card required</p>
                 </div>
             </section>

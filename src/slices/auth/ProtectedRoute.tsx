@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { AuthPage } from './AuthPage';
 
@@ -9,6 +10,22 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   const { state } = useAuth();
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+
+  // Check URL for auth mode query parameter
+  useEffect(() => {
+    const updateAuthMode = () => {
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.get('mode');
+      setAuthMode(mode === 'signup' ? 'signup' : 'login');
+    };
+
+    updateAuthMode();
+
+    // Listen for popstate events (back/forward navigation)
+    window.addEventListener('popstate', updateAuthMode);
+    return () => window.removeEventListener('popstate', updateAuthMode);
+  }, []);
 
   // Show loading state while checking authentication
   if (state.isLoading) {
@@ -24,7 +41,7 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
 
   // Show auth page if not authenticated
   if (!state.isAuthenticated) {
-    return fallback || <AuthPage />;
+    return fallback || <AuthPage initialMode={authMode} />;
   }
 
   // Show protected content if authenticated
