@@ -12,7 +12,8 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "deploy": "npm run build && wrangler pages deploy dist",
-    "pages:dev": "wrangler pages dev dist"
+    "pages:dev": "wrangler pages dev dist",
+    "a11y:landing": "node ./scripts/a11y-landing.js"
   },
   "dependencies": {
     "chart.js": "^4.5.0",
