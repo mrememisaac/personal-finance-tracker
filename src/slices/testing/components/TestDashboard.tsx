@@ -1,13 +1,15 @@
 import React, { useState, useContext } from 'react';
-import { TestTube, CheckCircle, XCircle, Clock, Play, Download, RefreshCw } from 'lucide-react';
+import { TestTube, CheckCircle, XCircle, Clock, Play, Download, RefreshCw, Eye } from 'lucide-react';
 import { AppContext } from '../../../shared/context/AppContext';
 import { TestService, type TestResults, type TestSuite } from '../TestService';
+import { AccessibilityTestDashboard } from './AccessibilityTestDashboard';
 
 export function TestDashboard() {
   const { state, dispatch } = useContext(AppContext);
   const [testResults, setTestResults] = useState<TestResults | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [selectedSuite, setSelectedSuite] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'functional' | 'accessibility'>('functional');
 
   const testService = new TestService(state, dispatch);
 
@@ -114,6 +116,45 @@ export function TestDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Test Type Tabs */}
+      <div className="bg-white rounded-lg shadow-md">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6" aria-label="Test types">
+            <button
+              onClick={() => setActiveTab('functional')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'functional'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              aria-selected={activeTab === 'functional'}
+              role="tab"
+            >
+              <TestTube className="h-4 w-4 mr-2 inline" aria-hidden="true" />
+              Functional Tests
+            </button>
+            <button
+              onClick={() => setActiveTab('accessibility')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'accessibility'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              aria-selected={activeTab === 'accessibility'}
+              role="tab"
+            >
+              <Eye className="h-4 w-4 mr-2 inline" aria-hidden="true" />
+              Accessibility Tests
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'accessibility' ? (
+        <AccessibilityTestDashboard />
+      ) : (
+        <div className="space-y-6">
       {/* Test Suite Status */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
@@ -424,6 +465,7 @@ export function TestDashboard() {
             </div>
           </div>
         </div>
+        )}
       )}
     </div>
   );
