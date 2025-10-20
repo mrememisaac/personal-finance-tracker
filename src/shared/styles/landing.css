@@ -96,9 +96,20 @@
     color: #0f172a;
 }
 
+.feature-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, rgba(14, 165, 164, 0.1), rgba(59, 130, 246, 0.05));
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+
 .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
+    color: var(--accent);
+    flex-shrink: 0;
 }
 
 .feature h3 {

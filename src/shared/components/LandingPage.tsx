@@ -1,4 +1,5 @@
 import React from 'react';
+import { TrendingUp, Lock, BarChart3 } from 'lucide-react';
 import '../../index.css';
 import '../styles/landing.css';
 
@@ -35,17 +36,23 @@ const LandingPage: React.FC = () => {
 
             <section className="landing-features">
                 <div className="feature">
-                    <div className="feature-icon">💰</div>
+                    <div className="feature-icon-wrapper">
+                        <TrendingUp className="feature-icon" size={32} strokeWidth={1.5} />
+                    </div>
                     <h3>Budget like a pro</h3>
                     <p>Set category limits, get alerts when you're close to budget, and understand spending patterns at a glance.</p>
                 </div>
                 <div className="feature">
-                    <div className="feature-icon">🔒</div>
+                    <div className="feature-icon-wrapper">
+                        <Lock className="feature-icon" size={32} strokeWidth={1.5} />
+                    </div>
                     <h3>Your data, private</h3>
                     <p>Everything stays in your account. We don't sell data, track you, or share with third parties.</p>
                 </div>
                 <div className="feature">
-                    <div className="feature-icon">📊</div>
+                    <div className="feature-icon-wrapper">
+                        <BarChart3 className="feature-icon" size={32} strokeWidth={1.5} />
+                    </div>
                     <h3>See the full picture</h3>
                     <p>Auto-categorized transactions, visual reports, and personalized recommendations to help you save.</p>
                 </div>
