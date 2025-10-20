@@ -1024,63 +1024,6 @@ export class TestService {
     };
   }
 
-  runTestInfrastructureTests(): TestSuite {
-    const startTime = Date.now();
-    const tests: TestResult[] = [];
-
-    // Test that test runner itself works
-    tests.push(this.runTest(
-      'Test runner functionality',
-      () => {
-        const expected = { working: true };
-        const actual = { working: true };
-        return { expected, actual };
-      }
-    ));
-
-    // Test performance monitoring
-    tests.push(this.runTest(
-      'Performance monitoring available',
-      () => {
-        const expected = { available: true };
-        const actual = { available: typeof performance !== 'undefined' };
-        return { expected, actual };
-      }
-    ));
-
-    // Test error handling in test runner
-    tests.push(this.runTest(
-      'Test runner error handling',
-      () => {
-        let errorHandled = false;
-        try {
-          this.runTest('Intentional error test', () => {
-            throw new Error('Test error');
-          });
-          errorHandled = true;
-        } catch (error) {
-          errorHandled = false;
-        }
-        
-        const expected = { handled: true };
-        const actual = { handled: errorHandled };
-        return { expected, actual };
-      }
-    ));
-
-    const passed = tests.filter(t => t.passed).length;
-    const failed = tests.filter(t => !t.passed).length;
-    const duration = Date.now() - startTime;
-
-    return {
-      name: 'Test Infrastructure Tests',
-      tests,
-      passed,
-      failed,
-      duration,
-    };
-  }
-
   private runTest(name: string, testFn: () => { expected: any; actual: any }): TestResult {
     const startTime = Date.now();
 
