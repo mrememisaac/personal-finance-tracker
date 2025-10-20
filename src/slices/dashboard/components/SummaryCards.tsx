@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { formatCurrency, getCurrentMonthRange } from '../../../shared/utils';
@@ -12,7 +12,7 @@ interface SummaryCardProps {
   currency?: string;
 }
 
-function SummaryCard({ title, amount, icon, trend = 'neutral', currency = 'USD' }: SummaryCardProps) {
+const SummaryCard = memo(function SummaryCard({ title, amount, icon, trend = 'neutral', currency = 'USD' }: SummaryCardProps) {
   const getCardStyles = () => {
     const baseStyles = "bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:scale-105 border-l-4";
     
@@ -68,36 +68,46 @@ function SummaryCard({ title, amount, icon, trend = 'neutral', currency = 'USD' 
       </div>
     </div>
   );
-}
+});
 
-export function SummaryCards() {
+export const SummaryCards = memo(function SummaryCards() {
   const { state } = useAppContext();
   const { transactions } = state;
-  const { start, end } = getCurrentMonthRange();
+  
+  // Memoize date range calculation
+  const dateRange = useMemo(() => getCurrentMonthRange(), []);
 
-  // Filter transactions for current month
-  const currentMonthTransactions = transactions.filter(
-    (transaction: Transaction) => 
-      transaction.date >= start && transaction.date <= end
+  // Memoize filtered transactions
+  const currentMonthTransactions = useMemo(() => 
+    transactions.filter(
+      (transaction: Transaction) => 
+        transaction.date >= dateRange.start && transaction.date <= dateRange.end
+    ), [transactions, dateRange.start, dateRange.end]
   );
 
-  // Calculate totals
-  const totalIncome = currentMonthTransactions
-    .filter((t: Transaction) => t.type === 'income')
-    .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+  // Memoize calculations
+  const { totalIncome, totalExpenses, netBalance } = useMemo(() => {
+    const income = currentMonthTransactions
+      .filter((t: Transaction) => t.type === 'income')
+      .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
 
-  const totalExpenses = currentMonthTransactions
-    .filter((t: Transaction) => t.type === 'expense')
-    .reduce((sum: number, t: Transaction) => sum + Math.abs(t.amount), 0);
+    const expenses = currentMonthTransactions
+      .filter((t: Transaction) => t.type === 'expense')
+      .reduce((sum: number, t: Transaction) => sum + Math.abs(t.amount), 0);
 
-  const netBalance = totalIncome - totalExpenses;
+    return {
+      totalIncome: income,
+      totalExpenses: expenses,
+      netBalance: income - expenses
+    };
+  }, [currentMonthTransactions]);
 
   // Determine trends based on financial health
-  const getBalanceTrend = (balance: number) => {
+  const getBalanceTrend = useMemo(() => (balance: number) => {
     if (balance > 0) return 'up';
     if (balance < 0) return 'down';
     return 'neutral';
-  };
+  }, []);
 
   const currency = state.settings.currency;
 
@@ -128,4 +138,4 @@ export function SummaryCards() {
       />
     </div>
   );
-}
+});
