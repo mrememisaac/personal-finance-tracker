@@ -1,34 +1,51 @@
-import React, { useMemo, useState } from 'react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from 'chart.js';
-import { Line, Bar, Pie } from 'react-chartjs-2';
+import React, { useMemo, useState, lazy, Suspense, memo } from 'react';
+
+// Lazy load Chart.js components
+const ChartComponents = lazy(async () => {
+  const {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+  } = await import('chart.js');
+  
+  const { Line, Bar, Pie } = await import('react-chartjs-2');
+
+  // Register Chart.js components
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement
+  );
+
+  return { Line, Bar, Pie };
+});
 import { TrendingUp, BarChart3, PieChart, Calendar } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { ReportService } from '../services/ReportService';
 import { getDateFilter } from '../../../shared/utils';
 import type { DatePeriod, ChartType } from '../../../shared/types';
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
+// Loading component for charts
+const ChartLoading = () => (
+  <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg animate-pulse">
+    <div className="text-center">
+      <div className="w-12 h-12 bg-gray-300 rounded-full mx-auto mb-2"></div>
+      <p className="text-gray-500">Loading chart...</p>
+    </div>
+  </div>
 );
 
 interface ChartsSectionProps {
@@ -36,7 +53,7 @@ interface ChartsSectionProps {
   onPeriodChange?: (period: DatePeriod) => void;
 }
 
-export function ChartsSection({ 
+export const ChartsSection = memo(function ChartsSection({ 
   selectedPeriod = '30days', 
   onPeriodChange 
 }: ChartsSectionProps) {
@@ -234,28 +251,36 @@ export function ChartsSection({
   const renderChart = () => {
     const chartContainerClass = "h-80 w-full";
     
-    switch (activeChart) {
-      case 'line':
-        return (
-          <div className={chartContainerClass}>
-            <Line data={monthlyTrendsData} options={lineChartOptions} />
-          </div>
-        );
-      case 'pie':
-        return (
-          <div className={chartContainerClass}>
-            <Pie data={expenseDistributionData} options={pieChartOptions} />
-          </div>
-        );
-      case 'bar':
-        return (
-          <div className={chartContainerClass}>
-            <Bar data={incomeVsExpensesData} options={barChartOptions} />
-          </div>
-        );
-      default:
-        return null;
-    }
+    return (
+      <Suspense fallback={<ChartLoading />}>
+        <ChartComponents>
+          {({ Line, Bar, Pie }) => {
+            switch (activeChart) {
+              case 'line':
+                return (
+                  <div className={chartContainerClass}>
+                    <Line data={monthlyTrendsData} options={lineChartOptions} />
+                  </div>
+                );
+              case 'pie':
+                return (
+                  <div className={chartContainerClass}>
+                    <Pie data={expenseDistributionData} options={pieChartOptions} />
+                  </div>
+                );
+              case 'bar':
+                return (
+                  <div className={chartContainerClass}>
+                    <Bar data={incomeVsExpensesData} options={barChartOptions} />
+                  </div>
+                );
+              default:
+                return null;
+            }
+          }}
+        </ChartComponents>
+      </Suspense>
+    );
   };
 
   return (
@@ -343,4 +368,4 @@ export function ChartsSection({
       </div>
     </div>
   );
-}
+});
