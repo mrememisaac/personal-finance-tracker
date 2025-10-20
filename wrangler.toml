@@ -1,18 +1,14 @@
 name = "personal-finance-tracker"
-main = "worker/index.ts"
 compatibility_date = "2024-01-01"
 
-# Workers Sites configuration for serving static assets
-[site]
-bucket = "./dist"
+pages_build_output_dir = "dist"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "directory"
 
 # Environment variables (add your own as needed)
 # [vars]
 # PUBLIC_API_URL = "https://api.example.com"
-
-[observability]
-[observability.logs]
-enabled = false
-head_sampling_rate = 1
-invocation_logs = true
-persist = true
