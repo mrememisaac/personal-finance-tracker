@@ -1,4 +1,5 @@
 
+import React, { memo, useMemo } from 'react';
 import { Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useAppContext } from '../../../shared/context/AppContext';
 import { formatCurrency, formatDate, sortBy } from '../../../shared/utils';
@@ -10,7 +11,7 @@ interface TransactionItemProps {
   dateFormat: string;
 }
 
-function TransactionItem({ transaction, currency, dateFormat }: TransactionItemProps) {
+const TransactionItem = memo(function TransactionItem({ transaction, currency, dateFormat }: TransactionItemProps) {
   const isIncome = transaction.type === 'income';
   const amount = Math.abs(transaction.amount);
 
@@ -50,14 +51,17 @@ function TransactionItem({ transaction, currency, dateFormat }: TransactionItemP
       </div>
     </div>
   );
-}
+});
 
-export function RecentTransactions() {
+export const RecentTransactions = memo(function RecentTransactions() {
   const { state } = useAppContext();
   const { transactions, settings } = state;
 
-  // Get the 5 most recent transactions
-  const recentTransactions = sortBy(transactions, 'date', 'desc').slice(0, 5);
+  // Memoize the 5 most recent transactions
+  const recentTransactions = useMemo(() => 
+    sortBy(transactions, 'date', 'desc').slice(0, 5),
+    [transactions]
+  );
 
   if (recentTransactions.length === 0) {
     return (
@@ -109,4 +113,4 @@ export function RecentTransactions() {
       )}
     </div>
   );
-}
+});
