@@ -11,12 +11,12 @@
     --tw-ring-color: #000000;
     --tw-border-opacity: 1;
   }
-  
+
   .high-contrast button:focus {
     outline: 3px solid #000000;
     outline-offset: 2px;
   }
-  
+
   .high-contrast input:focus,
   .high-contrast select:focus,
   .high-contrast textarea:focus {
@@ -27,6 +27,7 @@
 
 /* Reduced motion styles */
 @media (prefers-reduced-motion: reduce) {
+
   .reduced-motion *,
   .reduced-motion *::before,
   .reduced-motion *::after {
@@ -75,7 +76,7 @@ a:focus-visible {
   .no-print {
     display: none !important;
   }
-  
+
   * {
     animation: none !important;
     transition: none !important;

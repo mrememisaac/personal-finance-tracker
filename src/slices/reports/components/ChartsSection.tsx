@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, Suspense, memo } from 'react';
-import { 
+import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
@@ -46,9 +46,9 @@ interface ChartsSectionProps {
   onPeriodChange?: (period: DatePeriod) => void;
 }
 
-export const ChartsSection = memo(function ChartsSection({ 
-  selectedPeriod = '30days', 
-  onPeriodChange 
+export const ChartsSection = memo(function ChartsSection({
+  selectedPeriod = '30days',
+  onPeriodChange
 }: ChartsSectionProps) {
   const { state } = useAppContext();
   const [activeChart, setActiveChart] = useState<ChartType>('line');
@@ -100,7 +100,7 @@ export const ChartsSection = memo(function ChartsSection({
         mode: 'index' as const,
         intersect: false,
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const label = context.dataset.label || '';
             const value = new Intl.NumberFormat('en-US', {
               style: 'currency',
@@ -130,7 +130,7 @@ export const ChartsSection = memo(function ChartsSection({
           text: 'Amount ($)'
         },
         ticks: {
-          callback: function(value: any) {
+          callback: function (value: any) {
             return new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD',
@@ -164,7 +164,7 @@ export const ChartsSection = memo(function ChartsSection({
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const label = context.label || '';
             const value = new Intl.NumberFormat('en-US', {
               style: 'currency',
@@ -196,7 +196,7 @@ export const ChartsSection = memo(function ChartsSection({
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const value = new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD'
@@ -214,7 +214,7 @@ export const ChartsSection = memo(function ChartsSection({
           text: 'Amount ($)'
         },
         ticks: {
-          callback: function(value: any) {
+          callback: function (value: any) {
             return new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD',
@@ -243,7 +243,7 @@ export const ChartsSection = memo(function ChartsSection({
 
   const renderChart = () => {
     const chartContainerClass = "h-80 w-full";
-    
+
     return (
       <Suspense fallback={<ChartLoading />}>
         {activeChart === 'line' && (
@@ -270,7 +270,7 @@ export const ChartsSection = memo(function ChartsSection({
       {/* Header with controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
         <h2 className="text-xl font-bold text-gray-800">Financial Charts</h2>
-        
+
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
           {/* Period selector */}
           <div className="flex items-center space-x-2">
@@ -294,11 +294,10 @@ export const ChartsSection = memo(function ChartsSection({
               <button
                 key={type.value}
                 onClick={() => setActiveChart(type.value)}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  activeChart === type.value
+                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm font-medium transition-colors ${activeChart === type.value
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
-                }`}
+                  }`}
               >
                 {type.icon}
                 <span>{type.label}</span>
@@ -330,19 +329,19 @@ export const ChartsSection = memo(function ChartsSection({
         <div className="text-sm text-gray-600">
           {activeChart === 'line' && (
             <p>
-              <strong>Monthly Trends:</strong> Track your income and expenses over the last 12 months. 
+              <strong>Monthly Trends:</strong> Track your income and expenses over the last 12 months.
               Green line shows income, red line shows expenses. Hover over points for detailed amounts.
             </p>
           )}
           {activeChart === 'pie' && (
             <p>
-              <strong>Expense Distribution:</strong> See how your spending is distributed across different categories 
+              <strong>Expense Distribution:</strong> See how your spending is distributed across different categories
               for the selected time period. Hover over segments for detailed breakdown.
             </p>
           )}
           {activeChart === 'bar' && (
             <p>
-              <strong>Income vs Expenses:</strong> Compare your total income against total expenses 
+              <strong>Income vs Expenses:</strong> Compare your total income against total expenses
               for the selected period. Green represents income, red represents expenses.
             </p>
           )}

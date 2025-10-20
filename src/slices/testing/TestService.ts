@@ -1,7 +1,7 @@
 import type { AppState, AppAction } from '../../shared/types';
-import { 
-  formatCurrency, 
-  formatDate, 
+import {
+  formatCurrency,
+  formatDate,
   formatPercentage,
   validateTransaction,
   validateBudget,
@@ -577,9 +577,9 @@ export class TestService {
         ];
         const grouped = groupBy(data, 'category');
         const expected = { Food: 2, Transport: 1 };
-        const actual = { 
-          Food: grouped.Food?.length || 0, 
-          Transport: grouped.Transport?.length || 0 
+        const actual = {
+          Food: grouped.Food?.length || 0,
+          Transport: grouped.Transport?.length || 0
         };
         return { expected, actual };
       }
@@ -645,11 +645,11 @@ export class TestService {
     tests.push(this.runTest(
       'Is empty utility',
       () => {
-        const expected = { 
-          emptyString: true, 
-          emptyArray: true, 
-          emptyObject: true, 
-          nonEmpty: false 
+        const expected = {
+          emptyString: true,
+          emptyArray: true,
+          emptyObject: true,
+          nonEmpty: false
         };
         const actual = {
           emptyString: isEmpty(''),
@@ -668,7 +668,7 @@ export class TestService {
         const original = { a: 1, b: { c: 2 } };
         const cloned = deepClone(original);
         cloned.b.c = 3;
-        
+
         const expected = { original: 2, cloned: 3 };
         const actual = { original: original.b.c, cloned: cloned.b.c };
         return { expected, actual };
@@ -714,14 +714,14 @@ export class TestService {
           budgets: [],
           goals: [],
         };
-        
+
         const saveResult = storageService.saveData(testData);
         const loadResult = storageService.loadData();
-        
+
         const expected = { saved: true, loaded: true };
-        const actual = { 
-          saved: saveResult, 
-          loaded: loadResult !== null && Array.isArray(loadResult.accounts) 
+        const actual = {
+          saved: saveResult,
+          loaded: loadResult !== null && Array.isArray(loadResult.accounts)
         };
         return { expected, actual };
       }
@@ -733,11 +733,11 @@ export class TestService {
       () => {
         const storageService = new StorageService();
         const exportResult = storageService.exportData();
-        
+
         const expected = { hasData: true, isString: true };
-        const actual = { 
-          hasData: exportResult !== null, 
-          isString: typeof exportResult === 'string' 
+        const actual = {
+          hasData: exportResult !== null,
+          isString: typeof exportResult === 'string'
         };
         return { expected, actual };
       }
@@ -749,10 +749,10 @@ export class TestService {
       () => {
         const storageService = new StorageService();
         const info = storageService.getStorageInfo();
-        
+
         const expected = { hasUsed: true, hasAvailable: true, hasPercentage: true };
-        const actual = { 
-          hasUsed: typeof info.used === 'number', 
+        const actual = {
+          hasUsed: typeof info.used === 'number',
           hasAvailable: typeof info.available === 'number',
           hasPercentage: typeof info.percentage === 'number'
         };
@@ -840,7 +840,7 @@ export class TestService {
         const date = new Date('2024-01-15');
         const start = new Date('2024-01-15');
         const end = new Date('2024-01-15');
-        
+
         const expected = true;
         const actual = isDateInRange(date, start, end);
         return { expected, actual };
@@ -852,9 +852,9 @@ export class TestService {
       'Null/undefined handling in isEmpty',
       () => {
         const expected = { null: true, undefined: true };
-        const actual = { 
-          null: isEmpty(null), 
-          undefined: isEmpty(undefined) 
+        const actual = {
+          null: isEmpty(null),
+          undefined: isEmpty(undefined)
         };
         return { expected, actual };
       }
@@ -883,11 +883,11 @@ export class TestService {
       () => {
         const amount = 1234.56;
         const result = formatCurrency(amount, 'INVALID');
-        
+
         const expected = { hasResult: true, isString: true };
-        const actual = { 
-          hasResult: result !== null && result !== undefined, 
-          isString: typeof result === 'string' 
+        const actual = {
+          hasResult: result !== null && result !== undefined,
+          isString: typeof result === 'string'
         };
         return { expected, actual };
       }
@@ -899,11 +899,11 @@ export class TestService {
       () => {
         const incompleteTransaction = {};
         const result = validateTransaction(incompleteTransaction);
-        
+
         const expected = { isValid: false, hasErrors: true };
-        const actual = { 
-          isValid: result.isValid, 
-          hasErrors: result.errors.length > 0 
+        const actual = {
+          isValid: result.isValid,
+          hasErrors: result.errors.length > 0
         };
         return { expected, actual };
       }
@@ -915,7 +915,7 @@ export class TestService {
       () => {
         const invalidDate1 = new Date('invalid');
         const invalidDate2 = new Date('also-invalid');
-        
+
         // Should handle gracefully without throwing
         let errorThrown = false;
         try {
@@ -923,7 +923,7 @@ export class TestService {
         } catch (error) {
           errorThrown = true;
         }
-        
+
         const expected = false; // Should not throw error
         const actual = errorThrown;
         return { expected, actual };
@@ -935,7 +935,7 @@ export class TestService {
       'Storage error handling',
       () => {
         const storageService = new StorageService();
-        
+
         // Test with invalid data
         let errorHandled = true;
         try {
@@ -944,7 +944,7 @@ export class TestService {
         } catch (error) {
           errorHandled = true;
         }
-        
+
         const expected = true;
         const actual = errorHandled;
         return { expected, actual };
@@ -1055,12 +1055,12 @@ export class TestService {
   private calculateCoverage(): TestResults['coverage'] {
     // Calculate coverage based on actual test results
     const results = this.runAllTests();
-    const overallCoverage = results.totalTests > 0 ? 
+    const overallCoverage = results.totalTests > 0 ?
       Math.round((results.totalPassed / results.totalTests) * 100) : 0;
 
     // Calculate coverage by category based on test suites
     const suiteMap = new Map(results.suites.map(suite => [suite.name, suite]));
-    
+
     const modelsCoverage = this.calculateSuiteCoverage([
       suiteMap.get('Calculation Tests'),
       suiteMap.get('Data Integrity Tests'),
@@ -1155,8 +1155,8 @@ export class TestService {
       () => {
         const simpleTest = this.runTest('Simple test', () => ({ expected: true, actual: true }));
         const expected = { passed: true, hasName: true, hasDuration: true };
-        const actual = { 
-          passed: simpleTest.passed, 
+        const actual = {
+          passed: simpleTest.passed,
           hasName: typeof simpleTest.name === 'string',
           hasDuration: typeof simpleTest.duration === 'number'
         };
@@ -1169,11 +1169,11 @@ export class TestService {
       'Test result structure validation',
       () => {
         const mockResults = this.runCalculationTests();
-        const expected = { 
-          hasName: true, 
-          hasTests: true, 
-          hasPassed: true, 
-          hasFailed: true 
+        const expected = {
+          hasName: true,
+          hasTests: true,
+          hasPassed: true,
+          hasFailed: true
         };
         const actual = {
           hasName: typeof mockResults.name === 'string',
@@ -1190,10 +1190,10 @@ export class TestService {
       'Coverage calculation',
       () => {
         const coverage = this.calculateCoverage();
-        const expected = { 
-          hasOverall: true, 
-          hasModels: true, 
-          validRange: true 
+        const expected = {
+          hasOverall: true,
+          hasModels: true,
+          validRange: true
         };
         const actual = {
           hasOverall: typeof coverage.overall === 'number',
