@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Wallet, Settings } from 'lucide-react';
 import { AuthProvider, ProtectedRoute, UserMenu } from './slices/auth';
-import { lazy, Suspense } from 'react';
-const LandingPage = lazy(() => import('./shared/components/LandingPage'));
+import { Suspense } from 'react';
 import { AppProvider } from './shared/context/AppContext';
 import { ErrorBoundary } from './app/ErrorBoundary';
 import { Navigation } from './app/Navigation';
@@ -218,14 +217,14 @@ function MainApp() {
       </div>
 
       {/* Main Content */}
-      <main 
+      <main
         id="main-content"
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
         role="main"
         tabIndex={-1}
       >
         <ErrorBoundary>
-          <div 
+          <div
             id={`${activeTab}-panel`}
             role="tabpanel"
             aria-labelledby={`${activeTab}-tab`}
@@ -255,8 +254,8 @@ function App() {
         <AuthProvider>
           <AppProvider>
             <ServiceProvider>
-              <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
-                <ProtectedRoute fallback={<LandingPage /> }>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+                <ProtectedRoute>
                   <MainApp />
                 </ProtectedRoute>
               </Suspense>
